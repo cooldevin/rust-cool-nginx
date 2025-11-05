@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nginx 配置信息</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        .feature {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007acc;
+            background-color: #f9f9f9;
+        }
+        .config-section {
+            margin: 20px 0;
+        }
+        .config-section h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+        }
+        .config-item {
+            display: flex;
+            margin: 10px 0;
+        }
+        .config-key {
+            font-weight: bold;
+            width: 250px;
+        }
+        .config-value {
+            flex: 1;
+        }
+        .enabled {
+            color: green;
+        }
+        .disabled {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nginx 配置信息</h1>
+        <p>以下是当前服务器的配置信息：</p>
+        
+        <div class="feature">
+            <h2>服务器配置</h2>
+            <div class="config-section">
+                <div class="config-item">
+                    <div class="config-key">监听地址:</div>
+                    <div class="config-value" id="listen_addr">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">后端地址:</div>
+                    <div class="config-value" id="backend_addr">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">静态文件根目录:</div>
+                    <div class="config-value" id="static_root">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <h2>功能配置</h2>
+            
+            <div class="config-section">
+                <h3>基本 HTTP 服务</h3>
+                <div class="config-item">
+                    <div class="config-key">静态文件服务:</div>
+                    <div class="config-value" id="static_file_serving">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">反向代理:</div>
+                    <div class="config-value" id="reverse_proxy">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">FastCGI 支持:</div>
+                    <div class="config-value" id="fastcgi_support">-</div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h3>高级 HTTP 服务</h3>
+                <div class="config-item">
+                    <div class="config-key">负载均衡:</div>
+                    <div class="config-value" id="load_balancing">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">缓存机制:</div>
+                    <div class="config-value" id="caching">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">Gzip 压缩:</div>
+                    <div class="config-value" id="gzip_compression">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">虚拟主机:</div>
+                    <div class="config-value" id="virtual_hosts">-</div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h3>安全特性</h3>
+                <div class="config-item">
+                    <div class="config-key">访问控制:</div>
+                    <div class="config-value" id="access_control">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">请求频率限制:</div>
+                    <div class="config-value" id="rate_limiting">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">SSL/TLS:</div>
+                    <div class="config-value" id="ssl_tls">-</div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h3>其他功能</h3>
+                <div class="config-item">
+                    <div class="config-key">WebSocket 支持:</div>
+                    <div class="config-value" id="websocket_support">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 这里应该通过API获取实际的配置信息
+        // 目前使用模拟数据
+        const config = {
+            server: {
+                listen_addr: "127.0.0.1:3001",
+                backend_addr: "",
+                static_root: "./public"
+            },
+            features: {
+                static_file_serving: true,
+                reverse_proxy: true,
+                fastcgi_support: false,
+                load_balancing: false,
+                caching: false,
+                gzip_compression: false,
+                virtual_hosts: false,
+                access_control: false,
+                rate_limiting: false,
+                ssl_tls: false,
+                websocket_support: false
+            }
+        };
+        
+        // 填充服务器配置
+        document.getElementById('listen_addr').textContent = config.server.listen_addr;
+        document.getElementById('backend_addr').textContent = config.server.backend_addr || '无';
+        document.getElementById('static_root').textContent = config.server.static_root;
+        
+        // 填充功能配置
+        for (const [key, value] of Object.entries(config.features)) {
+            const element = document.getElementById(key);
+            if (element) {
+                element.textContent = value ? '已启用' : '已禁用';
+                element.className = value ? 'enabled' : 'disabled';
+            }
+        }
+    </script>
+</body>
+</html>
