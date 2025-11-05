@@ -114,7 +114,7 @@ impl Config {
     pub fn default() -> Self {
         Self {
             server: ServerConfig {
-                listen_addr: "127.0.0.1:3001".to_string(),
+                listen_addr: "127.0.0.1:80".to_string(),
                 backend_addr: String::new(),
                 static_root: "./public".to_string(),
                 access_log: Some("./logs/access.log".to_string()),
