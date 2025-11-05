@@ -18,8 +18,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     if args.len() > 1 && args[1] == "static" {
         // 启动静态文件服务器
         let static_root = args.get(2).cloned().unwrap_or_else(|| ".".to_string());
+        // 尝试从配置文件读取监听地址，如果没有则使用默认值
+        let config = Config::load().unwrap_or_else(|_| Config::default());
+        let default_addr: SocketAddr = ([127, 0, 0, 1], 80).into(); // 更改为默认使用80端口以匹配配置
         let addr = args.get(3).and_then(|s| s.parse::<SocketAddr>().ok())
-                       .unwrap_or_else(|| ([127, 0, 0, 1], 8080).into());
+                       .unwrap_or_else(|| {
+                           config.server.listen_addr
+                               .parse::<SocketAddr>()
+                               .unwrap_or(default_addr)
+                       });
         
         println!("Starting static file server on http://{} serving {}", addr, static_root);
         
