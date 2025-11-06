@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rust Cool Nginx</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            background: #e8f4fd;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px;
+        }
+        .button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rust Cool Nginx Desktop App</h1>
+        
+        <div class="status">
+            <p>Embedded Web Server Status: <strong>Running</strong></p>
+            <p>Listening on: http://127.0.0.1:8080</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <p>This is a desktop application built with Tauri that includes an embedded web server.</p>
+            <p>You can access the same content through your browser at: http://127.0.0.1:8080</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="#" class="button" onclick="alert('Server is running!')">Test Server</a>
+            <a href="http://127.0.0.1:8080" class="button" target="_blank">Open in Browser</a>
+        </div>
+    </div>
+</body>
+</html>

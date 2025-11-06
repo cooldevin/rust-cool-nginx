@@ -278,13 +278,13 @@ impl ProxyServer {
             }
         });
 
-        // 尝试使用 HTTP/2，如果失败则回退到 HTTP/1
-        let res = http2::Builder::new(hyper_util::rt::TokioExecutor::new())
+        // 使用 HTTP/1 处理连接
+        if let Err(err) = http1::Builder::new()
             .serve_connection(io, service)
-            .await;
-
-        // 忽略错误，因为我们只是演示 HTTP/2 支持的概念
-        let _ = res;
+            .await
+        {
+            eprintln!("Failed to serve connection: {:?}", err);
+        }
         
         // 减少活动连接计数
         // 注意：这里我们不能调用stats.decrement_connections()，因为stats已经被移动到闭包中
@@ -348,13 +348,13 @@ impl ProxyServer {
             }
         });
 
-        // 尝试使用 HTTP/2，如果失败则回退到 HTTP/1
-        let res = http2::Builder::new(hyper_util::rt::TokioExecutor::new())
+        // 使用 HTTP/1 处理连接
+        if let Err(err) = http1::Builder::new()
             .serve_connection(io, service)
-            .await;
-
-        // 忽略错误，因为我们只是演示 HTTP/2 支持的概念
-        let _ = res;
+            .await
+        {
+            eprintln!("Failed to serve connection: {:?}", err);
+        }
         
         // 减少活动连接计数
         // 注意：这里我们不能调用stats.decrement_connections()，因为stats已经被移动到闭包中

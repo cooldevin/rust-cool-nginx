@@ -1,20 +1,25 @@
 [package]
-name = "rust-cool-nginx"
+name = "rust-cool-nginx-workspace"
 version = "0.1.0"
 edition = "2021"
-default-run = "rust-cool-nginx"
 
 [[bin]]
 name = "test_client"
 path = "test_client.rs"
 
 [[bin]]
-name = "rust-cool-nginx"
+name = "rust-cool-nginx-server"
 path = "src/main.rs"
 
-[lib]
-name = "rust_cool_nginx"
-crate-type = ["staticlib", "cdylib", "rlib"]
+[workspace]
+members = ["src-tauri"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+incremental = false
+strip = true
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
@@ -39,8 +44,5 @@ base64 = "0.21"
 tokio-tungstenite = "0.20"
 futures-util = "0.3"
 image = "0.24"
-# Tauri dependencies
-tauri = { version = "2.0", features = ["protocol-asset", "devtools"] }
-tauri-runtime-wry = "2.0"
 tokio-stream = "0.1"
 sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite"] }
