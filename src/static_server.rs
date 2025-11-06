@@ -341,7 +341,7 @@ impl StaticServer {
     pub async fn handle_request(
         &self,
         req: Request<hyper::body::Incoming>,
-    ) -> Result<Response<Full<bytes::Bytes>>, Infallible> {
+    ) -> Result<Response<Full<bytes::Bytes>>, Box<dyn std::error::Error + Send + Sync>> {
         match (req.method(), req.uri().path()) {
             (&Method::GET, "/api/config") => {
                 // 提供配置信息的API端点

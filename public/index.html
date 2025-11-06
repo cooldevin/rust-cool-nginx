@@ -509,5 +509,38 @@
             <p>© 2025 Rust-Cool-Nginx - 高性能 Web 服务器 | 基于 Rust 和 Tokio 构建</p>
         </div>
     </footer>
+
+    <script>
+        // 检查是否在 Tauri 环境中运行
+        const isTauri = !!window.__TAURI__;
+        
+        if (isTauri) {
+            // 在 Tauri 环境中，修改导航链接行为
+            document.addEventListener('DOMContentLoaded', function() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 阻止默认行为
+                        e.preventDefault();
+                        
+                        // 获取链接的 href
+                        const href = this.getAttribute('href');
+                        
+                        // 根据链接执行不同操作
+                        if (href === '/') {
+                            // 主页，无需特殊处理
+                            window.location.href = '/';
+                        } else if (href === '/config.html') {
+                            // 配置页面
+                            window.location.href = '/config.html';
+                        } else if (href === '/status') {
+                            // 监控页面
+                            window.location.href = '/status';
+                        }
+                    });
+                });
+            });
+        }
+    </script>
 </body>
 </html>

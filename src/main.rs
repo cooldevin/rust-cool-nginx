@@ -12,6 +12,7 @@ use std::env;
 use std::net::SocketAddr;
 use tokio::signal;
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args: Vec<String> = env::args().collect();
@@ -61,7 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                                     async move {
                                         static_server.handle_request(req).await.map_err(|e| {
                                             eprintln!("Error handling request: {}", e);
-                                            panic!("Error handling request: {}", e)
+                                            std::io::Error::new(std::io::ErrorKind::Other, format!("Request handling error: {}", e))
                                         })
                                     }
                                 });
@@ -105,3 +106,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     
     Ok(())
 }
+
+#[cfg(target_arch = "wasm32")]
+fn main() {}

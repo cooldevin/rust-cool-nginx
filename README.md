@@ -1,163 +1,63 @@
-# Rust-Cool-Nginx
+# Rust Cool Nginx Desktop App
 
-[![Rust](https://img.shields.io/badge/rust-1.70%2B-blue.svg)](https://www.rust-lang.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+这是一个基于 Rust 和 Tauri 构建的桌面应用程序，将原有的 Web 服务器功能封装为桌面应用。
 
-基于 Rust 语言实现的高性能 Web 服务器，借鉴 Nginx 的核心功能设计理念，提供反向代理、静态文件服务、负载均衡等特性。
+## 功能特点
 
-![Rust-Cool-Nginx界面](public/test/sample.txt)
+- 将原有的 Web 服务器功能封装为 Windows 桌面应用
+- 使用 SQLite 数据库存储配置信息
+- 支持动态刷新配置，无需重启应用
+- 提供直观的图形用户界面
 
-## 🌟 特性
+## 构建和运行
 
-### 基础功能
-- **高性能异步处理** - 基于 Tokio 和 Hyper 构建的异步运行时
-- **静态文件服务** - 高效处理 HTML、CSS、JavaScript、图片等静态资源
-- **反向代理** - 支持 HTTP/HTTPS 协议代理
-- **SSL/TLS 支持** - 安全的 HTTPS 连接支持
+### 前置条件
 
-### 高级功能
-- **负载均衡** - 支持多种负载均衡算法（轮询、加权轮询等）
-- **内容压缩** - Gzip 压缩优化网络传输
-- **访问控制** - IP 黑白名单和请求频率限制
-- **WebSocket 支持** - 实时双向通信支持
-- **缓存机制** - HTTP 缓存优化性能
-- **模块化架构** - 功能模块化设计，易于扩展
-- **配置管理** - 支持外部配置文件和动态配置更新
-- **监控统计** - 实时监控服务器运行状态和性能指标
+- Rust 开发环境 (推荐使用最新稳定版)
+- 安装 Tauri CLI: `cargo install tauri-cli`
 
-### 安全特性
-- **IP 访问控制** - 基于 IP 的访问控制列表
-- **速率限制** - 防止恶意请求和 DDoS 攻击
-- **SSL/TLS 加密** - 数据传输加密保护
-
-## 📦 功能模块
-
-### 核心模块
-- **反向代理模块** - 实现 HTTP/HTTPS 请求转发
-- **静态文件服务模块** - 提供高效的静态资源服务
-- **负载均衡模块** - 支持多种负载均衡算法
-- **配置管理模块** - 统一配置加载和管理
-- **监控统计模块** - 实时性能监控和统计
-
-### 扩展模块
-- **访问控制模块** - IP 黑白名单和请求频率限制
-- **压缩模块** - Gzip 内容压缩
-- **缓存模块** - HTTP 响应缓存
-- **WebSocket 模块** - WebSocket 协议支持
-- **日志模块** - 详细的访问和错误日志记录
-
-## 🚀 快速开始
-
-### 环境要求
-- Rust 1.70 或更高版本
-- Cargo 包管理器
-
-### 安装
+### 构建应用
 
 ```bash
-# 克隆项目
-git clone https://github.com/your-username/rust-cool-nginx.git
-cd rust-cool-nginx
-
-# 构建项目
-cargo build --release
-
-# 运行反向代理服务器
-cargo run
-
-# 或运行静态文件服务器
-cargo run -- static ./public
+# 构建应用
+cargo tauri build
 ```
 
-### 配置
+### 开发模式运行
 
-创建 `nginx.conf` 配置文件：
-
-```toml
-[server]
-listen_addr = "127.0.0.1:80"
-backend_addr = "http://127.0.0.1:3000"
-static_root = "./public"
-
-[features]
-static_file_serving = true
-reverse_proxy = true
-load_balancing = false
-gzip_compression = true
-websocket_support = true
-
-[upstream]
-load_balancing_algorithm = "round_robin"
-servers = []
-
-[features.gzip]
-gzip_compression = true
-gzip_comp_level = 6
+```bash
+# 在开发模式下运行应用
+cargo tauri dev
 ```
 
-### 使用方法
-
-1. **启动反向代理服务器**：
-   ```bash
-   cargo run
-   ```
-
-2. **启动静态文件服务器**：
-   ```bash
-   cargo run -- static [静态文件目录] [监听地址]
-   ```
-
-3. **访问管理界面**：
-   - 主页：http://localhost:8080
-   - 配置页面：http://localhost:8080/config.html
-   - 监控统计：http://localhost:8080/status
-
-## 🛠️ API 接口
-
-### 配置管理接口
-- `GET /api/config` - 获取当前配置
-- `POST /api/config` - 更新配置
-
-### 监控统计接口
-- `GET /status` - 查看监控统计页面
-- `GET /api/status` - 获取 JSON 格式监控数据
-
-## 📁 项目结构
+## 项目结构
 
 ```
-rust-cool-nginx/
-├── src/
-│   ├── config/          # 配置管理模块
-│   ├── server/          # 服务器核心模块
-│   ├── modules/         # 功能模块
-│   │   ├── monitoring/   # 监控模块
-│   │   ├── load_balancing/ # 负载均衡模块
-│   │   ├── compression/  # 压缩模块
-│   │   └── ...           # 其他功能模块
-│   └── main.rs          # 程序入口
-├── public/              # 静态资源目录
-├── nginx.conf          # 配置文件
-├── Cargo.toml          # 项目依赖配置
-└── README.md           # 项目说明文档
+├── public/                 # 前端静态资源
+├── src/                    # Rust 核心代码
+│   ├── config/             # 配置管理模块
+│   ├── db/                 # 数据库操作模块
+│   ├── modules/            # 功能模块
+│   └── ...
+├── src-tauri/              # Tauri 桌面应用代码
+│   ├── main.rs             # Tauri 应用入口
+│   ├── Cargo.toml          # Tauri 依赖配置
+│   └── tauri.conf.json     # Tauri 配置文件
+├── nginx.conf              # 默认配置文件
+└── ...
 ```
 
-## 🤝 贡献
+## 数据存储
 
-欢迎提交 Issue 和 Pull Request 来帮助改进项目。
+应用使用 SQLite 数据库存储配置信息，数据库文件为 `config.db`，会在应用首次运行时自动创建。
 
-### 开发步骤
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+## 动态刷新
 
-## 📄 许可证
+当用户修改配置并保存后，应用会：
+1. 将新配置保存到 SQLite 数据库
+2. 更新内存中的配置
+3. 应用新配置，无需重启整个应用
 
-本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+## 支持平台
 
-## 🙏 鸣谢
-
-- [Tokio](https://tokio.rs/) - 异步运行时
-- [Hyper](https://hyper.rs/) - HTTP 实现
-- [Nginx](https://nginx.org/) - 灵感来源
+当前版本主要支持 Windows 平台，后续可以扩展支持 Linux 和 macOS。

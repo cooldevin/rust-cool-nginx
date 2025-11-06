@@ -723,83 +723,110 @@
     </footer>
 
     <script>
+        // 检查是否在 Tauri 环境中运行
+        const isTauri = !!window.__TAURI__;
+        
         // 通过API获取实际的配置信息
         function loadConfig() {
-            fetch('/api/config')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(config => {
-                    // 填充表单
-                    document.getElementById('listen_addr').value = config.server.listen_addr;
-                    document.getElementById('backend_addr').value = config.server.backend_addr || '';
-                    document.getElementById('static_root').value = config.server.static_root;
-
-                    document.getElementById('static_file_serving').value = config.features.static_file_serving.toString();
-                    document.getElementById('reverse_proxy').value = config.features.reverse_proxy.toString();
-                    document.getElementById('load_balancing').value = config.features.load_balancing.toString();
-
-                    if (config.upstream && config.upstream.load_balancing_algorithm) {
-                        document.getElementById('load_balancing_algorithm').value = config.upstream.load_balancing_algorithm;
-                    }
-
-                    if (config.upstream && config.upstream.servers) {
-                        document.getElementById('upstream_servers').value = JSON.stringify(config.upstream.servers, null, 2);
-                    }
-
-                    document.getElementById('gzip_compression').value = (config.features.gzip && config.features.gzip.gzip_compression || false).toString();
-                    document.getElementById('gzip_comp_level').value = config.features.gzip && config.features.gzip.gzip_comp_level || 6;
-
-                    document.getElementById('access_control').value = (config.features.access_control && config.features.access_control.access_control || false).toString();
-                    document.getElementById('rate_limiting').value = (config.features.access_control && config.features.access_control.rate_limiting || false).toString();
-
-                    if (config.features.access_control && config.features.access_control.allow_ips) {
-                        document.getElementById('allow_ips').value = JSON.stringify(config.features.access_control.allow_ips, null, 2);
-                    }
-
-                    if (config.features.access_control && config.features.access_control.deny_ips) {
-                        document.getElementById('deny_ips').value = JSON.stringify(config.features.access_control.deny_ips, null, 2);
-                    }
-
-                    // 填充显示区域
-                    document.getElementById('listen_addr_display').textContent = config.server.listen_addr;
-                    document.getElementById('backend_addr_display').textContent = config.server.backend_addr || '无';
-                    document.getElementById('static_root_display').textContent = config.server.static_root;
-
-                    const features = config.features;
-                    const featureMapping = {
-                        'static_file_serving_display': features.static_file_serving,
-                        'reverse_proxy_display': features.reverse_proxy,
-                        'fastcgi_support_display': features.fastcgi_support,
-                        'load_balancing_display': features.load_balancing,
-                        'caching_display': features.cache && features.cache.cache_enabled,
-                        'gzip_compression_display': features.gzip && features.gzip.gzip_compression,
-                        'virtual_hosts_display': features.virtual_hosts,
-                        'access_control_display': features.access_control && features.access_control.access_control,
-                        'rate_limiting_display': features.access_control && features.access_control.rate_limiting,
-                        'ssl_tls_display': features.ssl_tls,
-                        'websocket_support_display': features.websocket_support
-                    };
-
-                    for (const [key, value] of Object.entries(featureMapping)) {
-                        const element = document.getElementById(key);
-                        if (element) {
-                            element.textContent = value ? '已启用' : '已禁用';
-                            if (value) {
-                                element.classList.add('enabled');
-                            } else {
-                                element.classList.add('disabled');
-                            }
+            if (isTauri) {
+                // 在 Tauri 环境中，通过 Tauri 命令获取配置
+                window.__TAURI__.invoke('get_config')
+                    .then(config => {
+                        populateConfigForm(config);
+                        populateConfigDisplay(config);
+                    })
+                    .catch(error => {
+                        console.error('获取配置信息失败:', error);
+                        showMessage('加载配置信息失败: ' + error, 'error');
+                    });
+            } else {
+                // 在 Web 环境中，通过 API 获取配置
+                fetch('/api/config')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
+                        return response.json();
+                    })
+                    .then(config => {
+                        populateConfigForm(config);
+                        populateConfigDisplay(config);
+                    })
+                    .catch(error => {
+                        console.error('获取配置信息失败:', error);
+                        showMessage('加载配置信息失败，请确保服务器正在运行', 'error');
+                    });
+            }
+        }
+
+        // 填充表单
+        function populateConfigForm(config) {
+            // 填充表单
+            document.getElementById('listen_addr').value = config.server.listen_addr;
+            document.getElementById('backend_addr').value = config.server.backend_addr || '';
+            document.getElementById('static_root').value = config.server.static_root;
+
+            document.getElementById('static_file_serving').value = config.features.static_file_serving.toString();
+            document.getElementById('reverse_proxy').value = config.features.reverse_proxy.toString();
+            document.getElementById('load_balancing').value = config.features.load_balancing.toString();
+
+            if (config.upstream && config.upstream.load_balancing_algorithm) {
+                document.getElementById('load_balancing_algorithm').value = config.upstream.load_balancing_algorithm;
+            }
+
+            if (config.upstream && config.upstream.servers) {
+                document.getElementById('upstream_servers').value = JSON.stringify(config.upstream.servers, null, 2);
+            }
+
+            document.getElementById('gzip_compression').value = (config.features.gzip && config.features.gzip.gzip_compression || false).toString();
+            document.getElementById('gzip_comp_level').value = config.features.gzip && config.features.gzip.gzip_comp_level || 6;
+
+            document.getElementById('access_control').value = (config.features.access_control && config.features.access_control.access_control || false).toString();
+            document.getElementById('rate_limiting').value = (config.features.access_control && config.features.access_control.rate_limiting || false).toString();
+
+            if (config.features.access_control && config.features.access_control.allow_ips) {
+                document.getElementById('allow_ips').value = JSON.stringify(config.features.access_control.allow_ips, null, 2);
+            }
+
+            if (config.features.access_control && config.features.access_control.deny_ips) {
+                document.getElementById('deny_ips').value = JSON.stringify(config.features.access_control.deny_ips, null, 2);
+            }
+        }
+
+        // 填充显示区域
+        function populateConfigDisplay(config) {
+            document.getElementById('listen_addr_display').textContent = config.server.listen_addr;
+            document.getElementById('backend_addr_display').textContent = config.server.backend_addr || '无';
+            document.getElementById('static_root_display').textContent = config.server.static_root;
+
+            const features = config.features;
+            const featureMapping = {
+                'static_file_serving_display': features.static_file_serving,
+                'reverse_proxy_display': features.reverse_proxy,
+                'fastcgi_support_display': features.fastcgi_support,
+                'load_balancing_display': features.load_balancing,
+                'caching_display': features.cache && features.cache.cache_enabled,
+                'gzip_compression_display': features.gzip && features.gzip.gzip_compression,
+                'virtual_hosts_display': features.virtual_hosts,
+                'access_control_display': features.access_control && features.access_control.access_control,
+                'rate_limiting_display': features.access_control && features.access_control.rate_limiting,
+                'ssl_tls_display': features.ssl_tls,
+                'websocket_support_display': features.websocket_support
+            };
+
+            for (const [key, value] of Object.entries(featureMapping)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = value ? '已启用' : '已禁用';
+                    if (value) {
+                        element.classList.add('enabled');
+                        element.classList.remove('disabled');
+                    } else {
+                        element.classList.add('disabled');
+                        element.classList.remove('enabled');
                     }
-                })
-                .catch(error => {
-                    console.error('获取配置信息失败:', error);
-                    showMessage('加载配置信息失败，请确保服务器正在运行', 'error');
-                });
+                }
+            }
         }
 
         // 显示消息
@@ -911,35 +938,49 @@
                 return;
             }
 
-            // 发送更新请求
-            fetch('/api/config', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(config)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Network response was not ok: ' + text);
+            if (isTauri) {
+                // 在 Tauri 环境中，通过 Tauri 命令更新配置
+                window.__TAURI__.invoke('update_config', { newConfig: config })
+                    .then(() => {
+                        showMessage('配置保存成功', 'success');
+                        // 重新加载配置以确认更新
+                        loadConfig();
+                    })
+                    .catch(error => {
+                        console.error('保存配置失败:', error);
+                        showMessage('保存配置失败: ' + error, 'error');
                     });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    showMessage('配置保存成功', 'success');
-                    // 重新加载配置以确认更新
-                    loadConfig();
-                } else {
-                    showMessage('配置保存失败: ' + (data.error || '未知错误'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('保存配置失败:', error);
-                showMessage('保存配置失败: ' + error.message, 'error');
-            });
+            } else {
+                // 在 Web 环境中，通过 API 更新配置
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error('Network response was not ok: ' + text);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        showMessage('配置保存成功', 'success');
+                        // 重新加载配置以确认更新
+                        loadConfig();
+                    } else {
+                        showMessage('配置保存失败: ' + (data.error || '未知错误'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('保存配置失败:', error);
+                    showMessage('保存配置失败: ' + error.message, 'error');
+                });
+            }
         }
 
         // 页面加载完成后初始化
