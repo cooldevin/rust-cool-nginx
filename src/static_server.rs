@@ -369,6 +369,38 @@ impl StaticServer {
                     },
                 }
             }
+            (&Method::GET, "/status") => {
+                // 从监控模块导入所需组件
+                use crate::modules::monitoring::{ServerStats, StatusPage, StatsSnapshot};
+                
+                // 创建临时统计信息（在实际应用中，这应该来自共享的ServerStats实例）
+                let stats = ServerStats::new();
+                let snapshot = stats.get_stats();
+                let status_page = StatusPage::new();
+                
+                let html_content = status_page.generate_status_page(&snapshot);
+                Ok(Response::builder()
+                    .status(StatusCode::OK)
+                    .header(header::CONTENT_TYPE, "text/html; charset=utf-8")
+                    .body(Full::new(bytes::Bytes::from(html_content)))
+                    .unwrap())
+            }
+            (&Method::GET, "/api/status") => {
+                // 从监控模块导入所需组件
+                use crate::modules::monitoring::{ServerStats, StatusPage, StatsSnapshot};
+                
+                // 创建临时统计信息（在实际应用中，这应该来自共享的ServerStats实例）
+                let stats = ServerStats::new();
+                let snapshot = stats.get_stats();
+                let status_page = StatusPage::new();
+                
+                let json_content = status_page.generate_json_status(&snapshot);
+                Ok(Response::builder()
+                    .status(StatusCode::OK)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Full::new(bytes::Bytes::from(json_content)))
+                    .unwrap())
+            }
             (&Method::GET, path) => {
                 match self.serve_file(&req, path).await {
                     Ok(response) => Ok(response),

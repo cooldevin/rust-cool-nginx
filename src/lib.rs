@@ -5,6 +5,7 @@ mod error;
 mod static_server;
 mod fastcgi;
 mod tls;
+mod modules;
 
 pub use server::ProxyServer;
 pub use client::HttpClient;
@@ -13,4 +14,3 @@ pub use error::ProxyError;
 pub use static_server::StaticServer;
 pub use fastcgi::{FastCgiClient, FastCgiLoadBalancer};
 pub use tls::{TlsConfig, TlsTerminationProxy};
-

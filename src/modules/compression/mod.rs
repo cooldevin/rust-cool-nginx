@@ -21,7 +21,8 @@ impl CompressionModule {
                 if Self::is_compressible_content_type(content_type_str) {
                     // 检查内容长度是否足够大以值得压缩
                     let body = response.body();
-                    if body.size_hint().lower() > 200 {
+                    let body_size = body.size_hint().lower();
+                    if body_size > 200 {
                         return self.gzip_compress(response);
                     }
                 }
@@ -34,7 +35,8 @@ impl CompressionModule {
 
     fn gzip_compress(&self, response: Response<Full<bytes::Bytes>>) -> Result<Response<Full<bytes::Bytes>>, Box<dyn std::error::Error>> {
         let (parts, body) = response.into_parts();
-        let body_bytes = body.collect().await?.to_bytes();
+        // 获取body中的数据
+        let body_bytes: Bytes = body.into();
         
         // 执行 gzip 压缩
         let mut encoder = GzEncoder::new(Vec::new(), Compression::default());

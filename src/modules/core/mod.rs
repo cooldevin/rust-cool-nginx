@@ -1,4 +1,18 @@
-//! 核心模块接口
+//! 核心模块系统
+//! 提供模块注册、加载和管理功能
+
+use crate::modules::http;
+use crate::modules::proxy;
+use crate::modules::static_files;
+use crate::modules::load_balancing;
+use crate::modules::caching;
+// use crate::modules::compression;
+use crate::modules::access_control;
+use crate::modules::logging;
+use crate::modules::hot_reload;
+use crate::modules::process;
+use crate::modules::performance;
+use crate::modules::mail;
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -24,16 +38,3 @@ impl NginxModuleSystem {
         self.config.clone()
     }
 }
-// 重新导出各个模块
-pub use crate::modules::http;
-pub use crate::modules::proxy;
-pub use crate::modules::static_files;
-pub use crate::modules::load_balancing;
-pub use crate::modules::caching;
-pub use crate::modules::compression;
-pub use crate::modules::access_control;
-pub use crate::modules::logging;
-pub use crate::modules::hot_reload;
-pub use crate::modules::process;
-pub use crate::modules::performance;
-pub use crate::modules::mail;

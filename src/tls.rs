@@ -61,7 +61,7 @@ pub async fn load_tls_config(config: &TlsConfig) -> Result<TlsAcceptor, ProxyErr
 
 // 创建 TLS 客户端连接器
 pub fn create_tls_client_connector() -> Result<TlsConnector, ProxyError> {
-    let mut root_store = RootCertStore::empty();
+    let root_store = RootCertStore::empty();
     
     let config = ClientConfig::builder()
         .with_safe_defaults()

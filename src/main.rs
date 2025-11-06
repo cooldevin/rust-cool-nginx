@@ -3,6 +3,7 @@ mod server;
 mod client;
 mod error;
 mod static_server;
+mod modules;
 
 use config::Config;
 use server::ProxyServer;

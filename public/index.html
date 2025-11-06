@@ -5,372 +5,509 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rust-Cool-Nginx - 高性能Web服务器</title>
     <style>
-        :root {
-            --primary: #0ff;
-            --secondary: #f0f;
-            --dark: #000;
-            --light: #fff;
-            --gray: #333;
-            --gradient-start: #00dbde;
-            --gradient-end: #fc00ff;
+        @font-face {
+            font-family: "iconfont";
+            src: url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.woff2?t=1682299844365') format('woff2'),
+                 url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.woff?t=1682299844365') format('woff'),
+                 url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.ttf?t=1682299844365') format('truetype');
         }
-        
+
+        .iconfont {
+            font-family: "iconfont" !important;
+            font-size: 2.5rem;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        :root {
+            --primary-color: #17B3A6;
+            --primary-hover: #0e9c8f;
+            --secondary-color: #6c757d;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --bs-blue: #0d6efd;
+            --bs-indigo: #6610f2;
+            --bs-purple: #6f42c1;
+            --bs-pink: #d63384;
+            --bs-red: #dc3545;
+            --bs-orange: #fd7e14;
+            --bs-yellow: #ffc107;
+            --bs-green: #198754;
+            --bs-teal: #20c997;
+            --bs-cyan: #0dcaf0;
+            --bs-black: #000;
+            --bs-white: #fff;
+            --bs-gray: #6c757d;
+            --bs-gray-dark: #343a40;
+            --bs-gray-100: #f8f9fa;
+            --bs-gray-200: #e9ecef;
+            --bs-gray-300: #dee2e6;
+            --bs-gray-400: #ced4da;
+            --bs-gray-500: #adb5bd;
+            --bs-gray-600: #6c757d;
+            --bs-gray-700: #495057;
+            --bs-gray-800: #343a40;
+            --bs-gray-900: #212529;
+            --bs-primary: #0d6efd;
+            --bs-secondary: #6c757d;
+            --bs-success: #198754;
+            --bs-info: #0dcaf0;
+            --bs-warning: #ffc107;
+            --bs-danger: #dc3545;
+            --bs-light: #f8f9fa;
+            --bs-dark: #212529;
+            --bs-primary-rgb: 13, 110, 253;
+            --bs-secondary-rgb: 108, 117, 125;
+            --bs-success-rgb: 25, 135, 84;
+            --bs-info-rgb: 13, 202, 240;
+            --bs-warning-rgb: 255, 193, 7;
+            --bs-danger-rgb: 220, 53, 69;
+            --bs-light-rgb: 248, 249, 250;
+            --bs-dark-rgb: 33, 37, 41;
+            --bs-white-rgb: 255, 255, 255;
+            --bs-black-rgb: 0, 0, 0;
+            --bs-body-color-rgb: 33, 37, 41;
+            --bs-body-bg-rgb: 255, 255, 255;
+            --bs-font-sans-serif: "Inter", "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+            --bs-body-font-family: var(--bs-font-sans-serif);
+            --bs-body-font-size: 1rem;
+            --bs-body-font-weight: 400;
+            --bs-body-line-height: 1.5;
+            --bs-body-color: #212529;
+            --bs-body-bg: #fff;
+            --bs-border-width: 1px;
+            --bs-border-style: solid;
+            --bs-border-color: #dee2e6;
+            --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
+            --bs-border-radius: 0.375rem;
+            --bs-border-radius-sm: 0.25rem;
+            --bs-border-radius-lg: 0.5rem;
+            --bs-border-radius-xl: 1rem;
+            --bs-border-radius-2xl: 2rem;
+            --bs-border-radius-pill: 50rem;
+            --bs-link-color: #0d6efd;
+            --bs-link-hover-color: #0a58ca;
+            --bs-code-color: #d63384;
+            --bs-highlight-bg: #fff3cd;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 219, 222, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(252, 0, 255, 0.1) 0%, transparent 20%);
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--bs-body-color);
+            text-align: left;
+            background-color: var(--bs-body-bg);
         }
-        
+
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            width: 100%;
+            padding-right: calc(1.5rem * 0.5);
+            padding-left: calc(1.5rem * 0.5);
+            margin-right: auto;
+            margin-left: auto;
         }
-        
-        header {
-            text-align: center;
-            padding: 40px 0;
+
+        @media (min-width: 576px) {
+            .container {
+                max-width: 540px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1320px;
+            }
+        }
+
+        .navbar {
             position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background-color: var(--bs-white);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
-        
-        h1 {
-            font-size: 3.5rem;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0, 219, 222, 0.3);
-            letter-spacing: 2px;
+
+        .navbar > .container {
+            display: flex;
+            flex-wrap: inherit;
+            align-items: center;
+            justify-content: space-between;
         }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: #aaa;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
+
+        .navbar-brand {
+            padding-top: 0.3125rem;
+            padding-bottom: 0.3125rem;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            text-decoration: none;
+            white-space: nowrap;
+            font-weight: 700;
+            color: var(--primary-color);
         }
-        
+
+        .navbar-nav {
+            display: flex;
+            flex-direction: row;
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--bs-gray-800);
+            text-decoration: none;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+
+        .nav-link:hover, .nav-link:focus {
+            color: var(--primary-color);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .navbar-collapse {
+            flex-basis: 100%;
+            flex-grow: 1;
+            align-items: center;
+        }
+
+        .navbar-toggler {
+            padding: 0.25rem 0.75rem;
+            font-size: 1.25rem;
+            line-height: 1;
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            transition: box-shadow 0.15s ease-in-out;
+        }
+
+        .hero {
+            padding: 5rem 0;
+            background: linear-gradient(120deg, #e0f7fa 0%, #bbdefb 100%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--gray-800);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--bs-body-color);
+            text-align: center;
+            text-decoration: none;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            border-radius: 0.375rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .btn-primary {
+            color: var(--bs-white);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            color: var(--bs-white);
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            color: var(--bs-white);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .features {
+            padding: 5rem 0;
+            background-color: var(--bs-white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .section-title p {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            max-width: 700px;
+            margin: 1rem auto 0;
+        }
+
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
+            gap: 2rem;
         }
-        
+
         .feature-card {
-            background: rgba(30, 30, 40, 0.7);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100%;
+            word-wrap: break-word;
+            background-color: var(--bs-white);
+            background-clip: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            padding: 2rem;
         }
-        
+
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
-            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            transform: translateY(-0.5rem);
         }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
+
         .feature-title {
             font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--dark-color);
         }
-        
+
         .feature-description {
-            color: #ccc;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+            color: var(--gray-600);
+            flex-grow: 1;
         }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            color: white;
+
+        .feature-link {
+            color: var(--primary-color);
             text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 219, 222, 0.4);
+            font-weight: 500;
         }
-        
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 219, 222, 0.6);
+
+        .feature-link:hover {
+            text-decoration: underline;
         }
-        
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            margin-left: 10px;
+
+        .feature-link::after {
+            content: "→";
+            margin-left: 5px;
         }
-        
-        .btn-secondary:hover {
-            background: rgba(0, 255, 255, 0.1);
-        }
-        
+
         .actions {
             text-align: center;
-            margin: 40px 0;
+            padding: 2rem 0 5rem;
         }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2rem;
-            margin: 50px 0 30px;
-            color: var(--primary);
-            position: relative;
+
+        .actions .btn {
+            margin: 0 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
         }
-        
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            margin: 10px auto;
-            border-radius: 3px;
-        }
-        
+
         footer {
+            background-color: var(--light-color);
+            padding: 3rem 0;
             text-align: center;
-            padding: 30px 0;
-            color: #777;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 50px;
+            border-top: 1px solid var(--gray-200);
         }
-        
-        .glitch-effect {
-            position: relative;
-            display: inline-block;
+
+        footer p {
+            color: var(--gray-600);
+            margin: 0;
         }
-        
-        .glitch-effect::before,
-        .glitch-effect::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .glitch-effect::before {
-            left: 2px;
-            text-shadow: -2px 0 #f0f;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        
-        .glitch-effect::after {
-            left: -2px;
-            text-shadow: -2px 0 #0ff;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(1px, 9999px, 83px, 0); }
-            90% { clip: rect(71px, 9999px, 14px, 0); }
-            95% { clip: rect(60px, 9999px, 80px, 0); }
-            100% { clip: rect(93px, 9999px, 28px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(26px, 9999px, 55px, 0); }
-            95% { clip: rect(42px, 9999px, 97px, 0); }
-            100% { clip: rect(38px, 9999px, 49px, 0); }
-        }
-        
+
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
+            .hero {
+                padding: 3rem 0;
             }
-            
-            .subtitle {
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
                 font-size: 1rem;
             }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
+
+            .navbar-nav {
+                flex-direction: column;
+            }
+
+            .actions .btn {
+                display: block;
+                width: 80%;
+                margin: 0.5rem auto;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1 class="glitch-effect" data-text="RUST-COOL-NGINX">RUST-COOL-NGINX</h1>
-            <p class="subtitle">基于 Rust 构建的高性能、高并发 Web 服务器。融合 Nginx 的强大功能与 Rust 的内存安全保障，提供卓越的性能和稳定性。</p>
-        </header>
-        
-        <h2 class="section-title">核心功能</h2>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">高性能异步处理</h3>
-                <p class="feature-description">基于 Tokio 和 Hyper 构建的异步运行时，充分利用多核处理器优势，轻松应对高并发请求。</p>
-                <a href="#performance-details" class="btn btn-secondary">查看详情</a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🔄</div>
-                <h3 class="feature-title">反向代理</h3>
-                <p class="feature-description">强大的反向代理功能，支持负载均衡、健康检查和故障转移，确保服务高可用性。</p>
-                <a href="#proxy-details" class="btn btn-secondary">查看详情</a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3 class="feature-title">安全防护</h3>
-                <p class="feature-description">内置多重安全机制，包括访问控制、速率限制、SSL/TLS 加密等，全面保障网络安全。</p>
-                <a href="#security-details" class="btn btn-secondary">查看详情</a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">📦</div>
-                <h3 class="feature-title">静态文件服务</h3>
-                <p class="feature-description">高效的静态文件处理能力，支持 MIME 类型自动识别、缓存控制和防盗链机制。</p>
-                <a href="#static-details" class="btn btn-secondary">查看详情</a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">⚖️</div>
-                <h3 class="feature-title">负载均衡</h3>
-                <p class="feature-description">支持多种负载均衡算法，包括轮询、加权轮询、最少连接和 IP 哈希等策略。</p>
-                <a href="#loadbalancer-details" class="btn btn-secondary">查看详情</a>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🗜️</div>
-                <h3 class="feature-title">内容压缩</h3>
-                <p class="feature-description">支持 Gzip 和 Brotli 压缩算法，有效减少网络传输量，提升用户体验。</p>
-                <a href="#compression-details" class="btn btn-secondary">查看详情</a>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">Rust-Cool-Nginx</a>
+            <div class="navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/config.html">配置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/status">监控</a>
+                    </li>
+                </ul>
             </div>
         </div>
-        
-        <div class="actions">
-            <a href="/config.html" class="btn">查看服务器配置</a>
-            <a href="#features-overview" class="btn btn-secondary">功能总览</a>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>高性能 Web 服务器</h1>
+            <p>基于 Rust 和 Tokio 构建的高性能 Web 服务器，提供反向代理、静态文件服务、负载均衡等功能</p>
+            <a href="/config.html" class="btn btn-primary">开始使用</a>
         </div>
-        
-        <h2 class="section-title">技术架构</h2>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🦀</div>
-                <h3 class="feature-title">Rust 语言</h3>
-                <p class="feature-description">采用 Rust 编程语言开发，具备内存安全、无数据竞争等特性，从根本上避免内存泄漏和空指针等问题。</p>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>核心功能</h2>
+                <p>提供全面的 Web 服务器解决方案</p>
             </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">⚙️</div>
-                <h3 class="feature-title">模块化设计</h3>
-                <p class="feature-description">高度模块化的架构设计，便于功能扩展和定制化开发，满足各种复杂业务场景需求。</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">📈</div>
-                <h3 class="feature-title">可观测性</h3>
-                <p class="feature-description">内置监控和日志系统，实时掌握服务器运行状态，快速定位和解决问题。</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="iconfont icon-fanxiangdaili"></span>
+                    <h3 class="feature-title">反向代理</h3>
+                    <p class="feature-description">高性能反向代理功能，支持 HTTP/1.1 和 HTTP/2，可轻松将请求转发到后端服务器。</p>
+                    <a href="#" class="feature-link">了解更多</a>
+                </div>
+
+                <div class="feature-card">
+                    <span class="iconfont icon-wenjian"></span>
+                    <h3 class="feature-title">静态文件服务</h3>
+                    <p class="feature-description">快速、安全地提供静态文件服务，支持自动索引、缓存控制和 MIME 类型识别。</p>
+                    <a href="#" class="feature-link">了解更多</a>
+                </div>
+
+                <div class="feature-card">
+                    <span class="iconfont icon-fuzaijunheng"></span>
+                    <h3 class="feature-title">负载均衡</h3>
+                    <p class="feature-description">内置多种负载均衡算法，包括轮询、加权轮询、最少连接和 IP 哈希。</p>
+                    <a href="#" class="feature-link">了解更多</a>
+                </div>
+
+                <div class="feature-card">
+                    <span class="iconfont icon-anquan"></span>
+                    <h3 class="feature-title">访问控制</h3>
+                    <p class="feature-description">基于 IP 地址的访问控制列表（ACL）和请求频率限制，保护您的服务器安全。</p>
+                    <a href="#" class="feature-link">了解更多</a>
+                </div>
+
+                <div class="feature-card">
+                    <span class="iconfont icon-yasuo"></span>
+                    <h3 class="feature-title">Gzip 压缩</h3>
+                    <p class="feature-description">自动压缩响应内容以减少带宽使用并提高页面加载速度。</p>
+                    <a href="#" class="feature-link">了解更多</a>
+                </div>
+
+                <div class="feature-card">
+                    <span class="iconfont icon-jiankong"></span>
+                    <h3 class="feature-title">监控统计</h3>
+                    <p class="feature-description">实时监控服务器状态，包括连接数、请求数、错误率和流量统计。</p>
+                    <a href="/status" class="feature-link">查看统计</a>
+                </div>
             </div>
         </div>
-        
-        <footer>
+    </section>
+
+    <section class="actions">
+        <div class="container">
+            <a href="/config.html" class="btn btn-primary">配置服务器</a>
+            <a href="/status" class="btn btn-outline-primary">监控统计</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
             <p>© 2025 Rust-Cool-Nginx - 高性能 Web 服务器 | 基于 Rust 和 Tokio 构建</p>
-        </footer>
-    </div>
-    
-    <script>
-        // 添加一些交互动效
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.feature-card');
-            
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-            
-            // 平滑滚动到锚点
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        window.scrollTo({
-                            top: target.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        });
-    </script>
+        </div>
+    </footer>
 </body>
 </html>

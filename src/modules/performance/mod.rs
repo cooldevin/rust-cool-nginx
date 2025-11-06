@@ -105,7 +105,7 @@ pub struct MemoryPool {
 
 impl MemoryPool {
     pub fn new() -> Self {
-        Self
+        Self { }
     }
 
     pub fn allocate(&self, size: usize) -> Vec<u8> {
