@@ -175,22 +175,14 @@
             display: block;
         }
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
         .btn {
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 5px;
             border: none;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .btn-primary {
@@ -209,6 +201,12 @@
             padding: 20px;
             color: var(--gray);
             border-top: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -319,6 +317,10 @@
                     <div class="config-value" id="upstream_servers_count">-</div>
                 </div>
                 <div class="config-item">
+                    <div class="config-key">上游服务器详情:</div>
+                    <div class="config-value" id="upstream_servers_details">-</div>
+                </div>
+                <div class="config-item">
                     <div class="config-key">缓存机制:</div>
                     <div class="config-value" id="caching_display">-</div>
                 </div>
@@ -373,7 +375,7 @@
             </div>
             
             <div class="actions">
-                <a href="edit-config.html" class="btn btn-primary">编辑配置</a>
+                <button type="button" class="btn btn-primary" id="edit-config-btn">编辑配置</button>
             </div>
         </div>
     </div>
@@ -512,10 +514,6 @@
                 document.getElementById('ssl_enabled_display').textContent = config.server.ssl_enabled ? '已启用' : '已禁用';
                 document.getElementById('ssl_enabled_display').className = 'config-value ' + (config.server.ssl_enabled ? 'enabled' : 'disabled');
                 
-                // 负载均衡配置
-                document.getElementById('load_balancing_algorithm_display').textContent = getLoadBalancingAlgorithmName(config.upstream.load_balancing_algorithm) || '轮询';
-                document.getElementById('upstream_servers_count').textContent = config.upstream.servers ? config.upstream.servers.length : 0;
-                
                 // 基本 HTTP 服务
                 document.getElementById('static_file_serving_display').textContent = config.features.static_file_serving ? '已启用' : '已禁用';
                 document.getElementById('static_file_serving_display').className = 'config-value ' + (config.features.static_file_serving ? 'enabled' : 'disabled');
@@ -569,22 +567,31 @@
                 document.getElementById('monitoring_enabled_display').textContent = config.features.monitoring_enabled ? '已启用' : '已禁用';
                 document.getElementById('monitoring_enabled_display').className = 'config-value ' + (config.features.monitoring_enabled ? 'enabled' : 'disabled');
                 document.getElementById('stats_path_display').textContent = config.features.stats_path || '/nginx_status';
+                
+                // 负载均衡配置
+                document.getElementById('load_balancing_algorithm_display').textContent = getLoadBalancingAlgorithmName(config.upstream.load_balancing_algorithm) || '轮询';
+                document.getElementById('upstream_servers_count').textContent = config.upstream.servers ? config.upstream.servers.length : 0;
+                
+                // 显示上游服务器详情
+                if (config.upstream.servers && Array.isArray(config.upstream.servers) && config.upstream.servers.length > 0) {
+                    let serversDetails = '';
+                    config.upstream.servers.forEach((server, index) => {
+                        serversDetails += `服务器${index + 1}: ${server.address || '未设置'}\n`;
+                        if (server.weight) serversDetails += `  权重: ${server.weight}\n`;
+                        if (server.max_fails) serversDetails += `  最大失败次数: ${server.max_fails}\n`;
+                        if (server.fail_timeout) serversDetails += `  失败超时: ${server.fail_timeout}\n`;
+                        serversDetails += '\n';
+                    });
+                    document.getElementById('upstream_servers_details').textContent = serversDetails;
+                } else {
+                    document.getElementById('upstream_servers_details').textContent = '未配置上游服务器';
+                }
             } catch (e) {
                 console.error('填充显示区域时出错:', e);
                 showMessage('填充显示区域时出错: ' + e.message, 'error');
             }
         }
-        
-        // 获取负载均衡算法名称
-        function getLoadBalancingAlgorithmName(algorithm) {
-            const algorithms = {
-                'round_robin': '轮询 (Round Robin)',
-                'least_conn': '最少连接 (Least Connections)',
-                'ip_hash': 'IP哈希 (IP Hash)'
-            };
-            return algorithms[algorithm] || algorithm;
-        }
-        
+
         // 显示消息
         function showMessage(text, type) {
             const messageEl = document.getElementById('message');
@@ -595,6 +602,16 @@
             setTimeout(() => {
                 messageEl.className = 'message';
             }, 3000);
+        }
+        
+        // 获取负载均衡算法名称
+        function getLoadBalancingAlgorithmName(algorithm) {
+            const algorithms = {
+                'round_robin': '轮询 (Round Robin)',
+                'least_conn': '最少连接 (Least Connections)',
+                'ip_hash': 'IP哈希 (IP Hash)'
+            };
+            return algorithms[algorithm] || algorithm;
         }
 
         // 页面加载完成后初始化
@@ -607,7 +624,28 @@
                 console.log('window.location.protocol:', window.location.protocol);
                 
                 // 检查是否在 Tauri 环境中运行
-                isTauri = !!(window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function');
+                if (window.__TAURI__) {
+                    console.log('检测到 window.__TAURI__');
+                    isTauri = true;
+                    
+                    // 检查各种可能的 invoke 方法
+                    if (typeof window.__TAURI__.invoke === 'function') {
+                        console.log('window.__TAURI__.invoke 是函数');
+                    } else if (window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+                        console.log('window.__TAURI__.core.invoke 是函数');
+                    } else if (window.__TAURI__.tauri && typeof window.__TAURI__.tauri.invoke === 'function') {
+                        console.log('window.__TAURI__.tauri.invoke 是函数');
+                    } else {
+                        console.log('window.__TAURI__ 存在但没有找到 invoke 方法');
+                    }
+                } else if (window.location.protocol === 'tauri:') {
+                    console.log('检测到 tauri 协议，标记为 Tauri 环境');
+                    isTauri = true;
+                } else {
+                    console.log('未检测到 Tauri 环境，将使用Web模式');
+                    isTauri = false;
+                }
+                
                 console.log('Tauri environment check result:', isTauri);
                 
                 // 延迟加载配置
@@ -615,6 +653,11 @@
                     loadConfig();
                 }, 100);
             }, 500); // 延迟 500ms 确保 Tauri 完全初始化
+            
+            // 绑定编辑配置按钮事件
+            document.getElementById('edit-config-btn').addEventListener('click', function() {
+                window.location.href = 'edit-config.html';
+            });
         });
     </script>
 </body>
