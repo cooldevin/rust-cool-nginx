@@ -429,6 +429,74 @@ fn start_server() {
                                     }
                                 }
                                 
+                                // 检查是否是API请求，需要转发到上游服务器
+                                let uri_path = req.uri().path();
+                                if uri_path.starts_with("/admin-api/") {
+                                    // 获取上游服务器列表
+                                    let servers = {
+                                        let config = CONFIG.read().unwrap();
+                                        config.upstream.servers.clone()
+                                    };
+                                    
+                                    // 简单的负载均衡 - 轮询选择第一个服务器
+                                    if !servers.is_empty() {
+                                        let upstream_server = &servers[0];
+                                        let upstream_addr = &upstream_server.address;
+                                        
+                                        // 克隆请求信息
+                                        let method = req.method().clone();
+                                        let headers = req.headers().clone();
+                                        let uri = req.uri().clone();
+                                        let body = req.into_body();
+                                        
+                                        // 构造转发URL
+                                        let forward_url = format!("http://{}{}",
+                                            upstream_addr,
+                                            uri.path_and_query()
+                                                .map(|p| p.as_str())
+                                                .unwrap_or("")
+                                        );
+                                        
+                                        // 创建客户端并转发请求
+                                        let client = hyper::Client::new();
+                                        let mut forward_req = hyper::Request::builder()
+                                            .method(method)
+                                            .uri(&forward_url)
+                                            .body(body)
+                                            .unwrap();
+                                        
+                                        // 复制头部信息
+                                        for (name, value) in headers.iter() {
+                                            // 不转发原始的Host头，让hyper自动设置正确的Host头
+                                            if name != hyper::header::HOST {
+                                                forward_req.headers_mut().insert(name, value.clone());
+                                            }
+                                        }
+                                        
+                                        // 设置正确的Host头为上游服务器地址
+                                        if let Ok(host_header) = hyper::header::HeaderValue::from_str(upstream_addr) {
+                                            forward_req.headers_mut().insert(hyper::header::HOST, host_header);
+                                        }
+                                        
+                                        // 发送请求到上游服务器
+                                        match client.request(forward_req).await {
+                                            Ok(upstream_response) => {
+                                                // 返回上游服务器的响应
+                                                return Ok::<_, Infallible>(upstream_response);
+                                            }
+                                            Err(e) => {
+                                                eprintln!("转发请求到上游服务器失败: {}", e);
+                                                let response = Response::builder()
+                                                    .status(502)
+                                                    .header("Access-Control-Allow-Origin", "*")
+                                                    .body(Body::from("Bad Gateway"))
+                                                    .unwrap();
+                                                return Ok::<_, Infallible>(response);
+                                            }
+                                        }
+                                    }
+                                }
+                                
                                 // 提供静态文件服务
                                 match static_files.serve(req).await {
                                     Ok(mut response) => {
