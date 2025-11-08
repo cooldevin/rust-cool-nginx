@@ -6,6 +6,14 @@
     "main"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    "core:window:default",
+    "core:event:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default"
+  ],
+  "commands": [
+    "get_config"
   ]
 }

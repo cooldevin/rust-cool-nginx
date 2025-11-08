@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust-Cool-Nginx - 静态文件服务器</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .navbar {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background: rgba(30, 30, 40, 0.7);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        .navbar > .container {
+            display: flex;
+            flex-wrap: inherit;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            padding-top: 0.3125rem;
+            padding-bottom: 0.3125rem;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            text-decoration: none;
+            white-space: nowrap;
+            font-weight: 700;
+            color: var(--primary);
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .navbar-nav {
+            display: flex;
+            flex-direction: row;
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+
+        .nav-link:hover, .nav-link:focus {
+            color: var(--primary);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .navbar-collapse {
+            flex-basis: 100%;
+            flex-grow: 1;
+            align-items: center;
+        }
+
+        .navbar-toggler {
+            padding: 0.25rem 0.75rem;
+            font-size: 1.25rem;
+            line-height: 1;
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            transition: box-shadow 0.15s ease-in-out;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 30px 0;
+            margin: 20px 0 30px 0;
+            background: rgba(30, 30, 40, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 219, 222, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin: 50px 0 30px;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .feature-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100%;
+            word-wrap: break-word;
+            background: rgba(30, 30, 40, 0.7);
+            background-clip: border-box;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .config-section {
+            margin: 20px 0;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-key {
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .config-value {
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .config-value.enabled {
+            color: #0f0;
+        }
+
+        .config-value.disabled {
+            color: #f00;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--bs-body-color);
+            text-align: center;
+            text-decoration: none;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            border-radius: 0.375rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .btn-primary {
+            color: var(--bs-white);
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            border: none;
+        }
+
+        .btn-primary:hover {
+            color: var(--bs-white);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 219, 222, 0.4);
+        }
+
+        .test-section {
+            background: rgba(30, 30, 40, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .test-result {
+            background: rgba(20, 20, 30, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #ccc;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .test-result.success {
+            border-color: rgba(0, 255, 0, 0.5);
+            color: #0f0;
+        }
+
+        .test-result.error {
+            border-color: rgba(255, 0, 0, 0.5);
+            color: #f00;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 0.375rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background-color: rgba(20, 20, 30, 0.7);
+            color: var(--light);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(0, 219, 222, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            color: var(--bs-white);
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 219, 222, 0.4);
+        }
+
+        footer {
+            background: rgba(30, 30, 40, 0.7);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            margin-top: 30px;
+        }
+
+        footer p {
+            color: #777;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Rust-Cool-Nginx</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span>Menu</span>
+            </button>
+            <div class="navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="config.html">配置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="status.html">监控</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="static-file.html">静态文件</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>静态文件服务器</h1>
+            <p>高效提供静态资源服务，减轻后端服务器负载</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="section-title">功能介绍</div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3 class="feature-title">什么是静态文件服务器</h3>
+                <div class="config-section">
+                    <p>静态文件服务器是专门用于提供静态资源（如HTML、CSS、JS、图片、视频等）的服务器组件。它具有以下优势：</p>
+                    <ul>
+                        <li><span class="iconfont">&#10003;</span> 高效处理大量静态文件请求</li>
+                        <li><span class="iconfont">&#10003;</span> 减轻后端应用服务器负载</li>
+                        <li><span class="iconfont">&#10003;</span> 支持文件缓存以提高响应速度</li>
+                        <li><span class="iconfont">&#10003;</span> 支持Gzip压缩减少传输数据量</li>
+                        <li><span class="iconfont">&#10003;</span> 提供访问控制和安全防护</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h3 class="feature-title">当前配置</h3>
+                <div class="config-section">
+                    <div class="config-item">
+                        <div class="config-key">静态文件服务:</div>
+                        <div class="config-value enabled" id="static-file-status">已启用</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-key">根目录:</div>
+                        <div class="config-value" id="static-root">./public</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-key">Gzip压缩:</div>
+                        <div class="config-value disabled" id="gzip-status">已禁用</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-key">缓存机制:</div>
+                        <div class="config-value disabled" id="cache-status">已禁用</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">功能测试</div>
+        <div class="test-section">
+            <h3 class="feature-title">测试静态文件服务</h3>
+            <p>点击下面的按钮测试静态文件服务功能：</p>
+            
+            <div class="btn-group">
+                <button id="test-sample" class="btn btn-primary">测试 sample.txt 文件</button>
+                <button id="test-index" class="btn btn-outline-primary">测试主页</button>
+                <button id="test-css" class="btn btn-outline-primary">测试CSS文件</button>
+            </div>
+            
+            <div id="test-result" class="test-result" style="display: none;"></div>
+            <div id="test-content" style="display: none; margin-top: 20px;">
+                <h4>文件内容:</h4>
+                <pre id="file-content" style="background: #1e1e1e; padding: 15px; border-radius: 5px; overflow: auto; max-height: 300px;"></pre>
+            </div>
+        </div>
+
+        <div class="section-title">配置管理</div>
+        <div class="feature-card">
+            <h3 class="feature-title">静态文件服务器配置</h3>
+            <form id="static-config-form">
+                <div class="form-group">
+                    <label for="static_root">静态文件根目录:</label>
+                    <input type="text" id="static_root" name="static_root" value="./public" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="enable_static">启用静态文件服务:</label>
+                    <select id="enable_static" name="enable_static">
+                        <option value="true">启用</option>
+                        <option value="false">禁用</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="enable_gzip">启用Gzip压缩:</label>
+                    <select id="enable_gzip" name="enable_gzip">
+                        <option value="false">禁用</option>
+                        <option value="true">启用</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">保存配置</button>
+                    <button type="reset" class="btn btn-outline-primary">重置</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Rust-Cool-Nginx - 高性能 Web 服务器 | 基于 Rust 和 Tokio 构建</p>
+        </div>
+    </footer>
+
+    <script>
+        // 检查是否在 Tauri 环境中运行
+        const isTauri = !!window.__TAURI__;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成');
+            // 绑定测试按钮事件
+            const testSampleBtn = document.getElementById('test-sample');
+            const testIndexBtn = document.getElementById('test-index');
+            const testCssBtn = document.getElementById('test-css');
+            
+            if (testSampleBtn) {
+                console.log('绑定 test-sample 按钮事件');
+                testSampleBtn.addEventListener('click', testSampleFile);
+            } else {
+                console.error('找不到 test-sample 按钮');
+            }
+            
+            if (testIndexBtn) {
+                console.log('绑定 test-index 按钮事件');
+                testIndexBtn.addEventListener('click', testIndexFile);
+            } else {
+                console.error('找不到 test-index 按钮');
+            }
+            
+            if (testCssBtn) {
+                console.log('绑定 test-css 按钮事件');
+                testCssBtn.addEventListener('click', testCssFile);
+            } else {
+                console.error('找不到 test-css 按钮');
+            }
+            
+            // 绑定表单提交事件
+            document.getElementById('static-config-form').addEventListener('submit', saveConfig);
+            
+            // 加载当前配置
+            loadConfig();
+        });
+
+        // 通过API获取实际的配置信息
+        function loadConfig() {
+            if (isTauri) {
+                // 在 Tauri 环境中，通过 Tauri 命令获取配置
+                return window.__TAURI__.invoke('get_config')
+                    .then(config => {
+                        populateConfigForm(config);
+                        return config;
+                    })
+                    .catch(error => {
+                        console.error('获取配置信息失败:', error);
+                    });
+            } else {
+                // 在 Web 环境中，通过 API 获取配置
+                return fetch('/api/config')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(config => {
+                        populateConfigForm(config);
+                        return config;
+                    })
+                    .catch(error => {
+                        console.error('获取配置信息失败:', error);
+                    });
+            }
+        }
+
+        // 填充表单
+        function populateConfigForm(config) {
+            document.getElementById('static_root').value = config.server.static_root || './public';
+            document.getElementById('enable_static').value = config.features.static_file_serving.toString();
+            document.getElementById('enable_gzip').value = config.features.gzip_compression.toString();
+            
+            // 更新显示状态
+            document.getElementById('static-root').textContent = config.server.static_root || './public';
+            document.getElementById('static-file-status').textContent = config.features.static_file_serving ? '已启用' : '已禁用';
+            document.getElementById('gzip-status').textContent = config.features.gzip_compression ? '已启用' : '已禁用';
+            document.getElementById('cache-status').textContent = config.features.cache_enabled ? '已启用' : '已禁用';
+            
+            if (config.features.static_file_serving) {
+                document.getElementById('static-file-status').classList.add('enabled');
+                document.getElementById('static-file-status').classList.remove('disabled');
+            } else {
+                document.getElementById('static-file-status').classList.add('disabled');
+                document.getElementById('static-file-status').classList.remove('enabled');
+            }
+        }
+
+        // 当前测试的文件路径
+        let currentTestFile = '';
+        
+        // 测试 sample.txt 文件
+        function testSampleFile() {
+            currentTestFile = '/test/sample.txt';
+            console.log('测试 sample.txt 文件');
+            let fileUrl;
+            if (window.location.origin === 'http://tauri.localhost') {
+                // 在 Tauri 环境中，后端运行在 127.0.0.1:80
+                fileUrl = 'http://127.0.0.1:80/test/sample.txt';
+            } else {
+                // 在 Web 环境中，使用当前域名和端口
+                fileUrl = `${window.location.origin}/test/sample.txt`;
+            }
+            fetch(fileUrl)
+                .then(response => {
+                    console.log('收到响应:', response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok, status: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('成功获取数据:', data);
+                    // 处理可能的BOM标记
+                    let cleanData = data;
+                    if (data.charCodeAt(0) === 0xFEFF) {
+                        cleanData = data.slice(1);
+                    } else if (data.charCodeAt(0) === 0xFF && data.charCodeAt(1) === 0xFE) {
+                        // UTF-16 LE BOM
+                        cleanData = data.slice(2);
+                    } else if (data.charCodeAt(0) === 0xEF && data.charCodeAt(1) === 0xBB && data.charCodeAt(2) === 0xBF) {
+                        // UTF-8 BOM
+                        cleanData = data.slice(3);
+                    }
+                    showTestResult('成功访问 test/sample.txt 文件，大小: ' + cleanData.length + ' 字符', true);
+                    showFileContent(cleanData);
+                })
+                .catch(error => {
+                    console.error('访问 test/sample.txt 文件失败:', error);
+                    showTestResult('访问 test/sample.txt 文件失败: ' + error.message, false);
+                    hideFileContent();
+                });
+        }
+
+        // 测试主页
+        function testIndexFile() {
+            currentTestFile = '/index.html';
+            console.log('测试 index.html 文件');
+            let fileUrl;
+            if (window.location.origin === 'http://tauri.localhost') {
+                // 在 Tauri 环境中，后端运行在 127.0.0.1:80
+                fileUrl = 'http://127.0.0.1:80/index.html';
+            } else {
+                // 在 Web 环境中，使用当前域名和端口
+                fileUrl = `${window.location.origin}/index.html`;
+            }
+            fetch(fileUrl)
+                .then(response => {
+                    console.log('收到响应:', response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok, status: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('成功获取数据:', data);
+                    // 处理可能的BOM标记
+                    let cleanData = data;
+                    if (data.charCodeAt(0) === 0xFEFF) {
+                        cleanData = data.slice(1);
+                    } else if (data.charCodeAt(0) === 0xFF && data.charCodeAt(1) === 0xFE) {
+                        // UTF-16 LE BOM
+                        cleanData = data.slice(2);
+                    } else if (data.charCodeAt(0) === 0xEF && data.charCodeAt(1) === 0xBB && data.charCodeAt(2) === 0xBF) {
+                        // UTF-8 BOM
+                        cleanData = data.slice(3);
+                    }
+                    showTestResult('成功访问 index.html 文件，大小: ' + cleanData.length + ' 字符', true);
+                    showFileContent(cleanData);
+                })
+                .catch(error => {
+                    console.error('访问 index.html 文件失败:', error);
+                    showTestResult('访问 index.html 文件失败: ' + error.message, false);
+                    hideFileContent();
+                });
+        }
+
+        // 测试CSS文件
+        function testCssFile() {
+            currentTestFile = '/css/style.css';
+            console.log('测试 css/style.css 文件');
+            let fileUrl;
+            if (window.location.origin === 'http://tauri.localhost') {
+                // 在 Tauri 环境中，后端运行在 127.0.0.1:80
+                fileUrl = 'http://127.0.0.1:80/css/style.css';
+            } else {
+                // 在 Web 环境中，使用当前域名和端口
+                fileUrl = `${window.location.origin}/css/style.css`;
+            }
+            fetch(fileUrl)
+                .then(response => {
+                    console.log('收到响应:', response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok, status: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('成功获取数据，长度:', data.length);
+                    // 处理可能的BOM标记
+                    let cleanData = data;
+                    if (data.charCodeAt(0) === 0xFEFF) {
+                        cleanData = data.slice(1);
+                    } else if (data.charCodeAt(0) === 0xFF && data.charCodeAt(1) === 0xFE) {
+                        // UTF-16 LE BOM
+                        cleanData = data.slice(2);
+                    } else if (data.charCodeAt(0) === 0xEF && data.charCodeAt(1) === 0xBB && data.charCodeAt(2) === 0xBF) {
+                        // UTF-8 BOM
+                        cleanData = data.slice(3);
+                    }
+                    showTestResult('成功访问 css/style.css 文件，大小: ' + cleanData.length + ' 字符', true);
+                    showFileContent(cleanData);
+                })
+                .catch(error => {
+                    console.error('访问 css/style.css 文件失败:', error);
+                    showTestResult('访问 css/style.css 文件失败: ' + error.message, false);
+                    hideFileContent();
+                });
+        }
+
+        // 显示测试结果
+        function showTestResult(message, isSuccess) {
+            const resultEl = document.getElementById('test-result');
+            resultEl.textContent = message;
+            resultEl.style.display = 'block';
+            
+            if (isSuccess) {
+                resultEl.className = 'test-result success';
+            } else {
+                resultEl.className = 'test-result error';
+            }
+        }
+
+        // 显示文件内容
+        function showFileContent(content) {
+            const contentEl = document.getElementById('file-content');
+            const testContentEl = document.getElementById('test-content');
+            
+            // 根据文件类型显示不同的内容
+            let displayContent = '';
+            
+            // 限制显示的内容长度，避免页面卡顿
+            if (content.length > 10000) {
+                displayContent = content.substring(0, 10000) + '\n\n... (内容过长，已截断，总长度: ' + content.length + ' 字符)';
+            } else {
+                displayContent = content;
+            }
+            
+            // 添加文件信息和格式化
+            const fileInfo = '文件路径: ' + currentTestFile + '\n' +
+                            '文件大小: ' + content.length + ' 字符\n' +
+                            '获取时间: ' + new Date().toLocaleString() + '\n' +
+                            '='.repeat(50);
+            
+            displayContent = fileInfo + '\n' + displayContent;
+            
+            contentEl.textContent = displayContent;
+            testContentEl.style.display = 'block';
+            
+            // 滚动到文件内容区域
+            testContentEl.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 隐藏文件内容
+        function hideFileContent() {
+            document.getElementById('test-content').style.display = 'none';
+        }
+
+        // 保存配置
+        function saveConfig(event) {
+            event.preventDefault();
+
+            if (isTauri) {
+                // 在 Tauri 环境中，通过 Tauri 命令更新配置
+                window.__TAURI__.invoke('get_config')
+                    .then(config => {
+                        // 更新配置
+                        config.server.static_root = document.getElementById('static_root').value || './public';
+                        config.features.static_file_serving = document.getElementById('enable_static').value === 'true';
+                        config.features.gzip_compression = document.getElementById('enable_gzip').value === 'true';
+                        
+                        return window.__TAURI__.invoke('update_config', { newConfig: config });
+                    })
+                    .then(() => {
+                        showTestResult('配置保存成功', true);
+                        // 重新加载配置以确认更新
+                        return loadConfig();
+                    })
+                    .then(() => {
+                        showTestResult('配置已更新并刷新页面显示', true);
+                    })
+                    .catch(error => {
+                        console.error('保存配置失败:', error);
+                        showTestResult('保存配置失败: ' + error, false);
+                    });
+            } else {
+                showTestResult('在Web环境中，此功能需要后端API支持', false);
+            }
+        }
+    </script>
+</body>
+</html>

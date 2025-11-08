@@ -5,101 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rust-Cool-Nginx - 服务器配置</title>
     <style>
-        @font-face {
-            font-family: "iconfont";
-            src: url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.woff2?t=1682299844365') format('woff2'),
-                 url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.woff?t=1682299844365') format('woff'),
-                 url('https://at.alicdn.com/t/font_3908252_85nv8vj9d9.ttf?t=1682299844365') format('truetype');
-        }
-
-        .iconfont {
-            font-family: "iconfont" !important;
-            font-size: 2.5rem;
-            font-style: normal;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            margin-bottom: 1.5rem;
-            color: var(--primary-color);
-        }
-
         :root {
-            --primary-color: #17B3A6;
-            --primary-hover: #0e9c8f;
-            --secondary-color: #6c757d;
-            --dark-color: #212529;
-            --light-color: #f8f9fa;
-            --white: #ffffff;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-600: #6c757d;
-            --gray-800: #343a40;
-            --bs-blue: #0d6efd;
-            --bs-indigo: #6610f2;
-            --bs-purple: #6f42c1;
-            --bs-pink: #d63384;
-            --bs-red: #dc3545;
-            --bs-orange: #fd7e14;
-            --bs-yellow: #ffc107;
-            --bs-green: #198754;
-            --bs-teal: #20c997;
-            --bs-cyan: #0dcaf0;
-            --bs-black: #000;
-            --bs-white: #fff;
-            --bs-gray: #6c757d;
-            --bs-gray-dark: #343a40;
-            --bs-gray-100: #f8f9fa;
-            --bs-gray-200: #e9ecef;
-            --bs-gray-300: #dee2e6;
-            --bs-gray-400: #ced4da;
-            --bs-gray-500: #adb5bd;
-            --bs-gray-600: #6c757d;
-            --bs-gray-700: #495057;
-            --bs-gray-800: #343a40;
-            --bs-gray-900: #212529;
-            --bs-primary: #0d6efd;
-            --bs-secondary: #6c757d;
-            --bs-success: #198754;
-            --bs-info: #0dcaf0;
-            --bs-warning: #ffc107;
-            --bs-danger: #dc3545;
-            --bs-light: #f8f9fa;
-            --bs-dark: #212529;
-            --bs-primary-rgb: 13, 110, 253;
-            --bs-secondary-rgb: 108, 117, 125;
-            --bs-success-rgb: 25, 135, 84;
-            --bs-info-rgb: 13, 202, 240;
-            --bs-warning-rgb: 255, 193, 7;
-            --bs-danger-rgb: 220, 53, 69;
-            --bs-light-rgb: 248, 249, 250;
-            --bs-dark-rgb: 33, 37, 41;
-            --bs-white-rgb: 255, 255, 255;
-            --bs-black-rgb: 0, 0, 0;
-            --bs-body-color-rgb: 33, 37, 41;
-            --bs-body-bg-rgb: 255, 255, 255;
-            --bs-font-sans-serif: "Inter", "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
-            --bs-body-font-family: var(--bs-font-sans-serif);
-            --bs-body-font-size: 1rem;
-            --bs-body-font-weight: 400;
-            --bs-body-line-height: 1.5;
-            --bs-body-color: #212529;
-            --bs-body-bg: #fff;
-            --bs-border-width: 1px;
-            --bs-border-style: solid;
-            --bs-border-color: #dee2e6;
-            --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
-            --bs-border-radius: 0.375rem;
-            --bs-border-radius-sm: 0.25rem;
-            --bs-border-radius-lg: 0.5rem;
-            --bs-border-radius-xl: 1rem;
-            --bs-border-radius-2xl: 2rem;
-            --bs-border-radius-pill: 50rem;
-            --bs-link-color: #0d6efd;
-            --bs-link-hover-color: #0a58ca;
-            --bs-code-color: #d63384;
-            --bs-highlight-bg: #fff3cd;
+            --primary: #0ff;
+            --secondary: #f0f;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #fff;
+            --gray: #ccc;
+            --gradient-start: #00dbde;
+            --gradient-end: #fc00ff;
+            --success: #0f0;
+            --danger: #f00;
         }
 
         * {
@@ -109,319 +25,112 @@
         }
 
         body {
-            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: var(--bs-body-color);
-            text-align: left;
-            background-color: var(--bs-body-bg);
-        }
-
-        .container {
-            width: 100%;
-            padding-right: calc(1.5rem * 0.5);
-            padding-left: calc(1.5rem * 0.5);
-            margin-right: auto;
-            margin-left: auto;
-        }
-
-        @media (min-width: 576px) {
-            .container {
-                max-width: 540px;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                max-width: 720px;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .container {
-                max-width: 960px;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .container {
-                max-width: 1140px;
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .container {
-                max-width: 1320px;
-            }
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .navbar {
-            position: relative;
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            background-color: var(--bs-white);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .navbar > .container {
-            display: flex;
-            flex-wrap: inherit;
             align-items: center;
-            justify-content: space-between;
+            background: rgba(10, 10, 30, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
         }
 
         .navbar-brand {
-            padding-top: 0.3125rem;
-            padding-bottom: 0.3125rem;
-            margin-right: 1rem;
-            font-size: 1.25rem;
-            text-decoration: none;
-            white-space: nowrap;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-color);
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
         }
 
         .navbar-nav {
             display: flex;
-            flex-direction: row;
-            padding-left: 0;
-            margin-bottom: 0;
             list-style: none;
         }
 
+        .nav-item {
+            margin-left: 20px;
+        }
+
         .nav-link {
-            display: block;
-            padding: 0.5rem 1rem;
-            color: var(--bs-gray-800);
+            color: var(--gray);
             text-decoration: none;
-            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
         }
 
-        .nav-link:hover, .nav-link:focus {
-            color: var(--primary-color);
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(0, 255, 255, 0.1);
         }
 
-        .navbar-nav .nav-link.active {
-            color: var(--primary-color);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .navbar-collapse {
-            flex-basis: 100%;
-            flex-grow: 1;
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(10, 10, 30, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
             align-items: center;
         }
 
-        .navbar-toggler {
-            padding: 0.25rem 0.75rem;
-            font-size: 1.25rem;
-            line-height: 1;
-            background-color: transparent;
-            border: 1px solid transparent;
-            border-radius: 0.375rem;
-            transition: box-shadow 0.15s ease-in-out;
+        .card-title i {
+            margin-right: 10px;
+            font-size: 1.8rem;
         }
 
-        .hero {
-            padding: 3rem 0;
-            background: linear-gradient(120deg, #e0f7fa 0%, #bbdefb 100%);
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--dark-color);
-        }
-
-        .hero p {
-            font-size: 1.125rem;
-            margin-bottom: 1rem;
-            color: var(--gray-800);
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .config-content {
-            padding: 3rem 0;
-        }
-
-        .config-form {
-            background: var(--bs-white);
-            border-radius: 0.375rem;
-            padding: 2rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-bottom: 2rem;
-            border: 1px solid rgba(0, 0, 0, 0.125);
-        }
-
-        .form-title {
-            font-size: 1.75rem;
-            margin-bottom: 1.5rem;
-            color: var(--dark-color);
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--gray-800);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--gray-300);
-            border-radius: 0.375rem;
-            font-family: inherit;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            background-color: var(--bs-white);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            font-weight: 400;
-            line-height: 1.5;
-            color: var(--bs-body-color);
-            text-align: center;
-            text-decoration: none;
-            vertical-align: middle;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
-            background-color: transparent;
-            border: 1px solid transparent;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            border-radius: 0.375rem;
-            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        .btn-primary {
-            color: var(--bs-white);
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover {
-            color: var(--bs-white);
-            background-color: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-outline-primary:hover {
-            color: var(--bs-white);
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            display: none;
-        }
-
-        .message.success {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-            display: block;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #842029;
-            border: 1px solid #f5c2c7;
-            display: block;
-        }
-
-        .features-grid {
+        .config-display {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .feature-card {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            height: 100%;
-            word-wrap: break-word;
-            background-color: var(--bs-white);
-            background-clip: border-box;
-            border: 1px solid rgba(0, 0, 0, 0.125);
-            border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            padding: 2rem;
-        }
-
-        .feature-title {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        .config-section {
-            margin-top: 1rem;
+            gap: 15px;
         }
 
         .config-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--gray-200);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
         }
 
         .config-item:last-child {
@@ -429,56 +138,49 @@
         }
 
         .config-key {
-            font-weight: 500;
-            color: var(--gray-800);
+            color: var(--gray);
         }
 
         .config-value {
-            font-weight: 400;
-            color: var(--gray-600);
+            font-weight: 500;
         }
 
         .config-value.enabled {
-            color: #198754;
+            color: var(--success);
         }
 
         .config-value.disabled {
-            color: #dc3545;
+            color: var(--danger);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 100, 0, 0.3);
+            border: 1px solid var(--success);
+            color: var(--success);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(100, 0, 0, 0.3);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            display: block;
         }
 
         footer {
-            background-color: var(--light-color);
-            padding: 3rem 0;
             text-align: center;
-            border-top: 1px solid var(--gray-200);
-        }
-
-        footer p {
-            color: var(--gray-600);
-            margin: 0;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .btn-group {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                margin-bottom: 1rem;
-            }
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -486,231 +188,151 @@
     <nav class="navbar">
         <div class="container">
             <a class="navbar-brand" href="/">Rust-Cool-Nginx</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span>Menu</span>
-            </button>
-            <div class="navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/config.html">配置</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/status">监控</a>
-                    </li>
-                </ul>
-            </div>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="config.html">配置</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="status.html">监控</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="static-file.html">静态文件</a>
+                </li>
+            </ul>
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="container">
-            <h1>服务器配置</h1>
-            <p>以下是当前 Rust-Cool-Nginx 服务器的配置信息</p>
-        </div>
-    </section>
-
     <div class="container">
+        <div class="page-header">
+            <h1>服务器配置</h1>
+            <p>查看 Rust-Cool-Nginx 服务器配置</p>
+        </div>
+
         <div id="message" class="message"></div>
 
-        <div class="config-content">
-            <div class="config-form">
-                <h2 class="form-title">修改配置</h2>
-                <form id="config-form">
-                    <div class="form-group">
-                        <label for="listen_addr">监听地址:</label>
-                        <input type="text" id="listen_addr" name="listen_addr" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="backend_addr">后端地址 (留空表示静态文件服务模式):</label>
-                        <input type="text" id="backend_addr" name="backend_addr">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="static_root">静态文件根目录:</label>
-                        <input type="text" id="static_root" name="static_root" required>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="static_file_serving">静态文件服务:</label>
-                            <select id="static_file_serving" name="static_file_serving">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="reverse_proxy">反向代理:</label>
-                            <select id="reverse_proxy" name="reverse_proxy">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="load_balancing">负载均衡:</label>
-                            <select id="load_balancing" name="load_balancing">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="load_balancing_algorithm">负载均衡算法:</label>
-                            <select id="load_balancing_algorithm" name="load_balancing_algorithm">
-                                <option value="round_robin">轮询</option>
-                                <option value="weighted_round_robin">加权轮询</option>
-                                <option value="least_connections">最少连接</option>
-                                <option value="ip_hash">IP哈希</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="upstream_servers">上游服务器 (JSON格式):</label>
-                        <textarea id="upstream_servers" name="upstream_servers"></textarea>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="gzip_compression">Gzip压缩:</label>
-                            <select id="gzip_compression" name="gzip_compression">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="gzip_comp_level">压缩级别 (1-9):</label>
-                            <input type="number" id="gzip_comp_level" name="gzip_comp_level" min="1" max="9">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="access_control">访问控制:</label>
-                            <select id="access_control" name="access_control">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="rate_limiting">请求频率限制:</label>
-                            <select id="rate_limiting" name="rate_limiting">
-                                <option value="true">启用</option>
-                                <option value="false">禁用</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="allow_ips">允许的IP列表 (JSON数组):</label>
-                        <textarea id="allow_ips" name="allow_ips"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="deny_ips">拒绝的IP列表 (JSON数组):</label>
-                        <textarea id="deny_ips" name="deny_ips"></textarea>
-                    </div>
-
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-primary">保存配置</button>
-                        <button type="reset" class="btn btn-outline-primary">重置</button>
-                    </div>
-                </form>
-            </div>
-
-            <h2 class="form-title">当前配置详情</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="iconfont icon-shezhi"></span>
-                    <h3 class="feature-title">服务器配置</h3>
-                    <div class="config-section">
-                        <div class="config-item">
-                            <div class="config-key">监听地址:</div>
-                            <div class="config-value" id="listen_addr_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">后端地址:</div>
-                            <div class="config-value" id="backend_addr_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">静态文件根目录:</div>
-                            <div class="config-value" id="static_root_display">-</div>
-                        </div>
-                    </div>
+        <div class="card">
+            <h2 class="card-title">
+                <span>📋</span> 当前配置
+            </h2>
+            <div class="config-display">
+                <div class="config-item">
+                    <div class="config-key">监听地址:</div>
+                    <div class="config-value" id="listen_addr_display">-</div>
                 </div>
-
-                <div class="feature-card">
-                    <span class="iconfont icon-fuwu"></span>
-                    <h3 class="feature-title">基本 HTTP 服务</h3>
-                    <div class="config-section">
-                        <div class="config-item">
-                            <div class="config-key">静态文件服务:</div>
-                            <div class="config-value" id="static_file_serving_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">反向代理:</div>
-                            <div class="config-value" id="reverse_proxy_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">FastCGI 支持:</div>
-                            <div class="config-value" id="fastcgi_support_display">-</div>
-                        </div>
-                    </div>
+                <div class="config-item">
+                    <div class="config-key">后端地址:</div>
+                    <div class="config-value" id="backend_addr_display">-</div>
                 </div>
-
-                <div class="feature-card">
-                    <span class="iconfont icon-anquan1"></span>
-                    <h3 class="feature-title">安全特性</h3>
-                    <div class="config-section">
-                        <div class="config-item">
-                            <div class="config-key">访问控制:</div>
-                            <div class="config-value" id="access_control_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">请求频率限制:</div>
-                            <div class="config-value" id="rate_limiting_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">SSL/TLS:</div>
-                            <div class="config-value" id="ssl_tls_display">-</div>
-                        </div>
-                    </div>
+                <div class="config-item">
+                    <div class="config-key">静态文件根目录:</div>
+                    <div class="config-value" id="static_root_display">-</div>
                 </div>
-
-                <div class="feature-card">
-                    <span class="iconfont icon-gongneng"></span>
-                    <h3 class="feature-title">其他功能</h3>
-                    <div class="config-section">
-                        <div class="config-item">
-                            <div class="config-key">负载均衡:</div>
-                            <div class="config-value" id="load_balancing_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">缓存机制:</div>
-                            <div class="config-value" id="caching_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">Gzip 压缩:</div>
-                            <div class="config-value" id="gzip_compression_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">虚拟主机:</div>
-                            <div class="config-value" id="virtual_hosts_display">-</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-key">WebSocket 支持:</div>
-                            <div class="config-value" id="websocket_support_display">-</div>
-                        </div>
-                    </div>
+                <div class="config-item">
+                    <div class="config-key">访问日志:</div>
+                    <div class="config-value" id="access_log_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">错误日志:</div>
+                    <div class="config-value" id="error_log_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">日志级别:</div>
+                    <div class="config-value" id="log_level_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">SSL证书路径:</div>
+                    <div class="config-value" id="ssl_cert_path_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">SSL密钥路径:</div>
+                    <div class="config-value" id="ssl_key_path_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">SSL启用:</div>
+                    <div class="config-value" id="ssl_enabled_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">静态文件服务:</div>
+                    <div class="config-value" id="static_file_serving_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">反向代理:</div>
+                    <div class="config-value" id="reverse_proxy_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">FastCGI 支持:</div>
+                    <div class="config-value" id="fastcgi_support_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">访问控制:</div>
+                    <div class="config-value" id="access_control_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">请求频率限制:</div>
+                    <div class="config-value" id="rate_limiting_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">SSL/TLS:</div>
+                    <div class="config-value" id="ssl_tls_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">负载均衡:</div>
+                    <div class="config-value" id="load_balancing_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">缓存机制:</div>
+                    <div class="config-value" id="caching_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">缓存路径:</div>
+                    <div class="config-value" id="cache_path_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">缓存最大大小:</div>
+                    <div class="config-value" id="cache_max_size_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">缓存非活动时间:</div>
+                    <div class="config-value" id="cache_inactive_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">Gzip 压缩:</div>
+                    <div class="config-value" id="gzip_compression_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">Gzip 压缩级别:</div>
+                    <div class="config-value" id="gzip_comp_level_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">Gzip 最小长度:</div>
+                    <div class="config-value" id="gzip_min_length_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">虚拟主机:</div>
+                    <div class="config-value" id="virtual_hosts_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">WebSocket 支持:</div>
+                    <div class="config-value" id="websocket_support_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">工作进程数:</div>
+                    <div class="config-value" id="worker_processes_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">工作连接数:</div>
+                    <div class="config-value" id="worker_connections_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">监控启用:</div>
+                    <div class="config-value" id="monitoring_enabled_display">-</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-key">统计路径:</div>
+                    <div class="config-value" id="stats_path_display">-</div>
                 </div>
             </div>
         </div>
@@ -724,108 +346,188 @@
 
     <script>
         // 检查是否在 Tauri 环境中运行
-        const isTauri = !!window.__TAURI__;
+        var isTauri = false;
         
         // 通过API获取实际的配置信息
-        function loadConfig() {
-            if (isTauri) {
-                // 在 Tauri 环境中，通过 Tauri 命令获取配置
-                window.__TAURI__.invoke('get_config')
-                    .then(config => {
-                        populateConfigForm(config);
-                        populateConfigDisplay(config);
-                    })
-                    .catch(error => {
-                        console.error('获取配置信息失败:', error);
-                        showMessage('加载配置信息失败: ' + error, 'error');
-                    });
-            } else {
-                // 在 Web 环境中，通过 API 获取配置
-                fetch('/api/config')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+        async function loadConfig() {
+            console.log('开始加载配置...');
+            console.log('isTauri:', isTauri);
+            
+            // 无论是否检测到 Tauri 环境，都尝试多种方式获取配置
+            try {
+                let config;
+                
+                // 首先尝试 Tauri 方式
+                if (isTauri && window.__TAURI__) {
+                    console.log('在Tauri环境中，尝试调用Tauri命令');
+                    try {
+                        // 尝试不同的 Tauri API 调用方式
+                        if (window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+                            console.log('使用 window.__TAURI__.core.invoke 方法');
+                            config = await window.__TAURI__.core.invoke('get_config');
+                        } else if (typeof window.__TAURI__.invoke === 'function') {
+                            console.log('使用 window.__TAURI__.invoke 方法');
+                            config = await window.__TAURI__.invoke('get_config');
+                        } else if (window.__TAURI__.tauri && typeof window.__TAURI__.tauri.invoke === 'function') {
+                            console.log('使用 window.__TAURI__.tauri.invoke 方法');
+                            config = await window.__TAURI__.tauri.invoke('get_config');
+                        } else {
+                            throw new Error('未找到有效的 Tauri 调用方法');
                         }
-                        return response.json();
-                    })
-                    .then(config => {
-                        populateConfigForm(config);
-                        populateConfigDisplay(config);
-                    })
-                    .catch(error => {
-                        console.error('获取配置信息失败:', error);
-                        showMessage('加载配置信息失败，请确保服务器正在运行', 'error');
-                    });
-            }
-        }
-
-        // 填充表单
-        function populateConfigForm(config) {
-            // 填充表单
-            document.getElementById('listen_addr').value = config.server.listen_addr;
-            document.getElementById('backend_addr').value = config.server.backend_addr || '';
-            document.getElementById('static_root').value = config.server.static_root;
-
-            document.getElementById('static_file_serving').value = config.features.static_file_serving.toString();
-            document.getElementById('reverse_proxy').value = config.features.reverse_proxy.toString();
-            document.getElementById('load_balancing').value = config.features.load_balancing.toString();
-
-            if (config.upstream && config.upstream.load_balancing_algorithm) {
-                document.getElementById('load_balancing_algorithm').value = config.upstream.load_balancing_algorithm;
-            }
-
-            if (config.upstream && config.upstream.servers) {
-                document.getElementById('upstream_servers').value = JSON.stringify(config.upstream.servers, null, 2);
-            }
-
-            document.getElementById('gzip_compression').value = (config.features.gzip && config.features.gzip.gzip_compression || false).toString();
-            document.getElementById('gzip_comp_level').value = config.features.gzip && config.features.gzip.gzip_comp_level || 6;
-
-            document.getElementById('access_control').value = (config.features.access_control && config.features.access_control.access_control || false).toString();
-            document.getElementById('rate_limiting').value = (config.features.access_control && config.features.access_control.rate_limiting || false).toString();
-
-            if (config.features.access_control && config.features.access_control.allow_ips) {
-                document.getElementById('allow_ips').value = JSON.stringify(config.features.access_control.allow_ips, null, 2);
-            }
-
-            if (config.features.access_control && config.features.access_control.deny_ips) {
-                document.getElementById('deny_ips').value = JSON.stringify(config.features.access_control.deny_ips, null, 2);
-            }
-        }
-
-        // 填充显示区域
-        function populateConfigDisplay(config) {
-            document.getElementById('listen_addr_display').textContent = config.server.listen_addr;
-            document.getElementById('backend_addr_display').textContent = config.server.backend_addr || '无';
-            document.getElementById('static_root_display').textContent = config.server.static_root;
-
-            const features = config.features;
-            const featureMapping = {
-                'static_file_serving_display': features.static_file_serving,
-                'reverse_proxy_display': features.reverse_proxy,
-                'fastcgi_support_display': features.fastcgi_support,
-                'load_balancing_display': features.load_balancing,
-                'caching_display': features.cache && features.cache.cache_enabled,
-                'gzip_compression_display': features.gzip && features.gzip.gzip_compression,
-                'virtual_hosts_display': features.virtual_hosts,
-                'access_control_display': features.access_control && features.access_control.access_control,
-                'rate_limiting_display': features.access_control && features.access_control.rate_limiting,
-                'ssl_tls_display': features.ssl_tls,
-                'websocket_support_display': features.websocket_support
-            };
-
-            for (const [key, value] of Object.entries(featureMapping)) {
-                const element = document.getElementById(key);
-                if (element) {
-                    element.textContent = value ? '已启用' : '已禁用';
-                    if (value) {
-                        element.classList.add('enabled');
-                        element.classList.remove('disabled');
+                        console.log('通过Tauri获取到的配置:', config);
+                    } catch (tauriError) {
+                        console.error('Tauri调用失败:', tauriError);
+                        throw tauriError;
+                    }
+                } else {
+                    // 如果不是 Tauri 环境或 Tauri 对象不存在，尝试通过 HTTP API 获取配置
+                    console.log('通过HTTP API获取配置');
+                    // 构建正确的API地址
+                    let apiUrl;
+                    if (window.location.origin === 'http://tauri.localhost') {
+                        // 在 Tauri 环境中，后端运行在 127.0.0.1:80
+                        apiUrl = 'http://127.0.0.1:80/api/config';
                     } else {
-                        element.classList.add('disabled');
-                        element.classList.remove('enabled');
+                        // 在 Web 环境中，使用当前域名和端口
+                        apiUrl = `${window.location.origin}/api/config`;
+                    }
+                    console.log('API URL:', apiUrl);
+                    
+                    const response = await fetch(apiUrl);
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        // 检查响应是否为 JSON 格式
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        config = await response.json();
+                        console.log('通过HTTP API获取到的配置:', config);
+                    } else {
+                        // 如果响应不是 JSON 格式，抛出错误
+                        const text = await response.text();
+                        console.log('HTTP API 响应内容:', text);
+                        console.error('HTTP API 返回非 JSON 响应:', text.substring(0, 100) + '...');
+                        throw new Error('HTTP API 返回非 JSON 响应');
                     }
                 }
+                
+                // 填充配置显示区域
+                populateConfigDisplay(config);
+                return config;
+            } catch (error) {
+                console.error('获取配置信息失败:', error);
+                
+                // 显示错误信息
+                showMessage('加载配置信息失败: ' + error.message, 'error');
+                
+                // 提供默认配置作为备选方案
+                console.log('使用默认配置');
+                const defaultConfig = {
+                    server: {
+                        listen_addr: '127.0.0.1:80',
+                        backend_addr: '',
+                        static_root: './public'
+                    },
+                    upstream: {
+                        load_balancing_algorithm: 'round_robin',
+                        servers: []
+                    },
+                    features: {
+                        static_file_serving: true,
+                        reverse_proxy: true,
+                        fastcgi_support: false,
+                        load_balancing: false,
+                        cache_enabled: false,
+                        gzip_compression: false,
+                        virtual_hosts: false,
+                        access_control: false,
+                        rate_limiting: false,
+                        ssl_tls: false,
+                        websocket_support: true,
+                        monitoring_enabled: true,
+                        stats_path: '/nginx_status'
+                    }
+                };
+                
+                // 填充默认配置
+                populateConfigDisplay(defaultConfig);
+                return defaultConfig;
+            }
+        }
+        
+        // 填充配置显示区域
+        function populateConfigDisplay(config) {
+            console.log('填充显示区域数据:', config);
+            try {
+                // 服务器配置
+                document.getElementById('listen_addr_display').textContent = config.server.listen_addr || '127.0.0.1:80';
+                document.getElementById('backend_addr_display').textContent = config.server.backend_addr || '未设置';
+                document.getElementById('static_root_display').textContent = config.server.static_root || './public';
+                document.getElementById('access_log_display').textContent = config.server.access_log || './logs/access.log';
+                document.getElementById('error_log_display').textContent = config.server.error_log || './logs/error.log';
+                document.getElementById('log_level_display').textContent = config.server.log_level || 'info';
+                document.getElementById('ssl_cert_path_display').textContent = config.server.ssl_cert_path || '未设置';
+                document.getElementById('ssl_key_path_display').textContent = config.server.ssl_key_path || '未设置';
+                document.getElementById('ssl_enabled_display').textContent = config.server.ssl_enabled ? '已启用' : '已禁用';
+                document.getElementById('ssl_enabled_display').className = 'config-value ' + (config.server.ssl_enabled ? 'enabled' : 'disabled');
+                
+                // 基本 HTTP 服务
+                document.getElementById('static_file_serving_display').textContent = config.features.static_file_serving ? '已启用' : '已禁用';
+                document.getElementById('static_file_serving_display').className = 'config-value ' + (config.features.static_file_serving ? 'enabled' : 'disabled');
+                
+                document.getElementById('reverse_proxy_display').textContent = config.features.reverse_proxy ? '已启用' : '已禁用';
+                document.getElementById('reverse_proxy_display').className = 'config-value ' + (config.features.reverse_proxy ? 'enabled' : 'disabled');
+                
+                document.getElementById('fastcgi_support_display').textContent = config.features.fastcgi_support ? '已启用' : '已禁用';
+                document.getElementById('fastcgi_support_display').className = 'config-value ' + (config.features.fastcgi_support ? 'enabled' : 'disabled');
+                
+                // 安全特性
+                document.getElementById('access_control_display').textContent = config.features.access_control ? '已启用' : '已禁用';
+                document.getElementById('access_control_display').className = 'config-value ' + (config.features.access_control ? 'enabled' : 'disabled');
+                
+                document.getElementById('rate_limiting_display').textContent = config.features.rate_limiting ? '已启用' : '已禁用';
+                document.getElementById('rate_limiting_display').className = 'config-value ' + (config.features.rate_limiting ? 'enabled' : 'disabled');
+                
+                document.getElementById('ssl_tls_display').textContent = config.features.ssl_tls ? '已启用' : '已禁用';
+                document.getElementById('ssl_tls_display').className = 'config-value ' + (config.features.ssl_tls ? 'enabled' : 'disabled');
+                
+                // 其他功能
+                document.getElementById('load_balancing_display').textContent = config.features.load_balancing ? '已启用' : '已禁用';
+                document.getElementById('load_balancing_display').className = 'config-value ' + (config.features.load_balancing ? 'enabled' : 'disabled');
+                
+                document.getElementById('caching_display').textContent = config.features.cache_enabled ? '已启用' : '已禁用';
+                document.getElementById('caching_display').className = 'config-value ' + (config.features.cache_enabled ? 'enabled' : 'disabled');
+                
+                document.getElementById('gzip_compression_display').textContent = config.features.gzip_compression ? '已启用' : '已禁用';
+                document.getElementById('gzip_compression_display').className = 'config-value ' + (config.features.gzip_compression ? 'enabled' : 'disabled');
+                
+                document.getElementById('virtual_hosts_display').textContent = config.features.virtual_hosts ? '已启用' : '已禁用';
+                document.getElementById('virtual_hosts_display').className = 'config-value ' + (config.features.virtual_hosts ? 'enabled' : 'disabled');
+                
+                document.getElementById('websocket_support_display').textContent = config.features.websocket_support ? '已启用' : '已禁用';
+                document.getElementById('websocket_support_display').className = 'config-value ' + (config.features.websocket_support ? 'enabled' : 'disabled');
+                
+                // 缓存配置
+                document.getElementById('cache_path_display').textContent = config.features.cache_path || '未设置';
+                document.getElementById('cache_max_size_display').textContent = config.features.cache_max_size || '未设置';
+                document.getElementById('cache_inactive_display').textContent = config.features.cache_inactive || '未设置';
+                
+                // Gzip配置
+                document.getElementById('gzip_comp_level_display').textContent = config.features.gzip_comp_level || '未设置';
+                document.getElementById('gzip_min_length_display').textContent = config.features.gzip_min_length || '未设置';
+                
+                // 工作进程配置
+                document.getElementById('worker_processes_display').textContent = config.features.worker_processes || '未设置';
+                document.getElementById('worker_connections_display').textContent = config.features.worker_connections || '未设置';
+                
+                // 监控配置
+                document.getElementById('monitoring_enabled_display').textContent = config.features.monitoring_enabled ? '已启用' : '已禁用';
+                document.getElementById('monitoring_enabled_display').className = 'config-value ' + (config.features.monitoring_enabled ? 'enabled' : 'disabled');
+                document.getElementById('stats_path_display').textContent = config.features.stats_path || '/nginx_status';
+            } catch (e) {
+                console.error('填充显示区域时出错:', e);
+                showMessage('填充显示区域时出错: ' + e.message, 'error');
             }
         }
 
@@ -841,157 +543,45 @@
             }, 3000);
         }
 
-        // 无操作函数
-        function startConfigPolling() {
-            // 配置更新后会立即刷新，不需要定期轮询
-        }
-
-        // 保存配置
-        function saveConfig(event) {
-            event.preventDefault();
-
-            // 构建配置对象，严格按照后端期望的格式
-            const formData = new FormData(document.getElementById('config-form'));
-
-            // 创建基础配置对象
-            const config = {
-                server: {
-                    listen_addr: formData.get('listen_addr'),
-                    backend_addr: formData.get('backend_addr'),
-                    static_root: formData.get('static_root'),
-                    access_log: "./logs/access.log",
-                    error_log: "./logs/error.log",
-                    log_level: "info",
-                    ssl_cert_path: "./certs/server.crt",
-                    ssl_key_path: "./certs/server.key",
-                    ssl_enabled: false
-                },
-                upstream: {
-                    load_balancing_algorithm: formData.get('load_balancing_algorithm') || "round_robin",
-                    servers: []
-                },
-                features: {
-                    static_file_serving: formData.get('static_file_serving') === 'true',
-                    reverse_proxy: formData.get('reverse_proxy') === 'true',
-                    fastcgi_support: false,
-                    load_balancing: formData.get('load_balancing') === 'true',
-                    // 注意：以下字段由于使用了 #[serde(flatten)]，需要直接放在 features 对象中
-                    cache_enabled: false,
-                    cache_path: "./cache",
-                    cache_max_size: "100M",
-                    cache_inactive: "60m",
-                    gzip_compression: formData.get('gzip_compression') === 'true',
-                    gzip_comp_level: parseInt(formData.get('gzip_comp_level')) || 6,
-                    gzip_min_length: 1024,
-                    gzip_types: ["text/plain", "text/css", "application/json", "application/javascript", "text/xml", "application/xml"],
-                    virtual_hosts: false,
-                    access_control: formData.get('access_control') === 'true',
-                    allow_ips: [],
-                    deny_ips: [],
-                    rate_limiting: formData.get('rate_limiting') === 'true',
-                    max_requests_per_minute: 1000,
-                    ssl_tls: false,
-                    websocket_support: true,
-                    worker_processes: 4,
-                    worker_connections: 1024,
-                    monitoring_enabled: true,
-                    stats_path: "/nginx_status"
-                }
-            };
-
-            // 解析上游服务器配置
-            try {
-                if (formData.get('upstream_servers')) {
-                    const serversValue = formData.get('upstream_servers').trim();
-                    if (serversValue) {
-                        config.upstream.servers = JSON.parse(serversValue);
-                    }
-                }
-            } catch (e) {
-                showMessage('上游服务器配置格式错误: ' + e.message, 'error');
-                return;
-            }
-
-            // 解析允许的IP列表
-            try {
-                if (formData.get('allow_ips')) {
-                    const allowIpsValue = formData.get('allow_ips').trim();
-                    if (allowIpsValue) {
-                        config.features.allow_ips = JSON.parse(allowIpsValue);
-                    }
-                }
-            } catch (e) {
-                showMessage('允许的IP列表格式错误: ' + e.message, 'error');
-                return;
-            }
-
-            // 解析拒绝的IP列表
-            try {
-                if (formData.get('deny_ips')) {
-                    const denyIpsValue = formData.get('deny_ips').trim();
-                    if (denyIpsValue) {
-                        config.features.deny_ips = JSON.parse(denyIpsValue);
-                    }
-                }
-            } catch (e) {
-                showMessage('拒绝的IP列表格式错误: ' + e.message, 'error');
-                return;
-            }
-
-            if (isTauri) {
-                // 在 Tauri 环境中，通过 Tauri 命令更新配置
-                window.__TAURI__.invoke('update_config', { newConfig: config })
-                    .then(() => {
-                        showMessage('配置保存成功', 'success');
-                        // 重新加载配置以确认更新
-                        loadConfig();
-                    })
-                    .catch(error => {
-                        console.error('保存配置失败:', error);
-                        showMessage('保存配置失败: ' + error, 'error');
-                    });
-            } else {
-                // 在 Web 环境中，通过 API 更新配置
-                fetch('/api/config', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(config)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error('Network response was not ok: ' + text);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        showMessage('配置保存成功', 'success');
-                        // 重新加载配置以确认更新
-                        loadConfig();
-                    } else {
-                        showMessage('配置保存失败: ' + (data.error || '未知错误'), 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('保存配置失败:', error);
-                    showMessage('保存配置失败: ' + error.message, 'error');
-                });
-            }
-        }
-
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
-            loadConfig();
-
-            // 绑定表单提交事件
-            document.getElementById('config-form').addEventListener('submit', saveConfig);
-
-            // 启动配置轮询
-            startConfigPolling();
+            // 增加延迟确保 Tauri 完全初始化
+            setTimeout(function() {
+                // 检查多种可能的 Tauri 对象存在形式
+                console.log('检查 Tauri 环境...');
+                console.log('window.__TAURI__:', window.__TAURI__);
+                console.log('window.location.protocol:', window.location.protocol);
+                
+                // 检查是否在 Tauri 环境中运行
+                if (window.__TAURI__) {
+                    console.log('检测到 window.__TAURI__');
+                    isTauri = true;
+                    
+                    // 检查各种可能的 invoke 方法
+                    if (typeof window.__TAURI__.invoke === 'function') {
+                        console.log('window.__TAURI__.invoke 是函数');
+                    } else if (window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+                        console.log('window.__TAURI__.core.invoke 是函数');
+                    } else if (window.__TAURI__.tauri && typeof window.__TAURI__.tauri.invoke === 'function') {
+                        console.log('window.__TAURI__.tauri.invoke 是函数');
+                    } else {
+                        console.log('window.__TAURI__ 存在但没有找到 invoke 方法');
+                    }
+                } else if (window.location.protocol === 'tauri:') {
+                    console.log('检测到 tauri 协议，标记为 Tauri 环境');
+                    isTauri = true;
+                } else {
+                    console.log('未检测到 Tauri 环境，将使用Web模式');
+                    isTauri = false;
+                }
+                
+                console.log('Tauri environment check result:', isTauri);
+                
+                // 延迟加载配置
+                setTimeout(function() {
+                    loadConfig();
+                }, 100);
+            }, 500); // 延迟 500ms 确保 Tauri 完全初始化
         });
     </script>
 </body>

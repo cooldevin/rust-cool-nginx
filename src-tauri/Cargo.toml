@@ -26,3 +26,12 @@ tauri-plugin-log = "2"
 tokio = { version = "1.0", features = ["full"] }
 hyper = { version = "0.14", features = ["server", "http1", "runtime"] }
 hyper-staticfile = "0.9"
+lazy_static = "1.4"
+
+[dev-dependencies]
+tauri-cli = { version = "2.3.1", features = [] }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
