@@ -38,7 +38,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_config])
+        .invoke_handler(tauri::generate_handler![get_config, update_config])
         .run(tauri::generate_context!());
         
     match result {
@@ -55,6 +55,7 @@ pub fn run() {
 use std::sync::{Arc, RwLock};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::fs;
+use std::io::Write;
 
 // 监控数据结构
 #[derive(serde::Serialize)]
@@ -275,6 +276,34 @@ fn get_config() -> Result<ServerConfig, String> {
     Ok(config.clone())
 }
 
+/// 更新配置
+#[tauri::command]
+fn update_config(new_config: ServerConfig) -> Result<(), String> {
+    println!("开始更新配置: {:?}", new_config);
+    
+    // 更新内存中的配置
+    {
+        let mut config = CONFIG.write().map_err(|e| format!("获取写入锁失败: {}", e))?;
+        *config = new_config.clone();
+    }
+    
+    // 持久化配置到文件
+    let config_str = serde_json::to_string_pretty(&new_config)
+        .map_err(|e| format!("序列化配置失败: {}", e))?;
+    
+    // 使用完整路径写入配置文件
+    let current_dir = std::env::current_dir().map_err(|e| format!("获取当前目录失败: {}", e))?;
+    let config_path = current_dir.join("nginx.conf");
+    
+    println!("准备写入配置文件，路径: {:?}", config_path);
+    
+    fs::write(&config_path, config_str)
+        .map_err(|e| format!("写入配置文件失败: {}，路径: {:?}", e, config_path))?;
+    
+    println!("配置已更新并保存到 nginx.conf 文件，路径: {:?}", config_path);
+    Ok(())
+}
+
 fn start_server() {
     // 创建一个永不结束的后台线程来运行服务器
     std::thread::spawn(|| {
@@ -351,6 +380,53 @@ fn start_server() {
                                         .body(Body::from(json_data))
                                         .unwrap();
                                     return Ok::<_, Infallible>(response);
+                                }
+                                
+                                // 检查是否是配置更新端点
+                                if req.uri().path() == "/api/config" && req.method() == hyper::Method::PUT {
+                                    // 读取请求体
+                                    let body_bytes = hyper::body::to_bytes(req.into_body()).await.unwrap();
+                                    let body_str = String::from_utf8(body_bytes.to_vec()).unwrap();
+                                    
+                                    // 解析配置
+                                    let new_config: ServerConfig = match serde_json::from_str(&body_str) {
+                                        Ok(config) => config,
+                                        Err(e) => {
+                                            let error_msg = format!("解析配置失败: {}", e);
+                                            eprintln!("{}", error_msg);
+                                            let response = Response::builder()
+                                                .status(400)
+                                                .header("Content-Type", "application/json")
+                                                .header("Access-Control-Allow-Origin", "*")
+                                                .body(Body::from(serde_json::json!({"error": error_msg}).to_string()))
+                                                .unwrap();
+                                            return Ok::<_, Infallible>(response);
+                                        }
+                                    };
+                                    
+                                    // 更新配置
+                                    match update_config(new_config) {
+                                        Ok(()) => {
+                                            let response = Response::builder()
+                                                .status(200)
+                                                .header("Content-Type", "application/json")
+                                                .header("Access-Control-Allow-Origin", "*")
+                                                .body(Body::from(serde_json::json!({"message": "配置更新成功"}).to_string()))
+                                                .unwrap();
+                                            return Ok::<_, Infallible>(response);
+                                        },
+                                        Err(e) => {
+                                            let error_msg = format!("更新配置失败: {}", e);
+                                            eprintln!("{}", error_msg);
+                                            let response = Response::builder()
+                                                .status(500)
+                                                .header("Content-Type", "application/json")
+                                                .header("Access-Control-Allow-Origin", "*")
+                                                .body(Body::from(serde_json::json!({"error": error_msg}).to_string()))
+                                                .unwrap();
+                                            return Ok::<_, Infallible>(response);
+                                        }
+                                    }
                                 }
                                 
                                 // 提供静态文件服务

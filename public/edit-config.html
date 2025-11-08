@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust-Cool-Nginx - 编辑配置</title>
+    <style>
+        :root {
+            --primary: #0ff;
+            --secondary: #f0f;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #fff;
+            --gray: #ccc;
+            --gradient-start: #00dbde;
+            --gradient-end: #fc00ff;
+            --success: #0f0;
+            --danger: #f00;
+            --warning: #ff0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 30, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-left: 20px;
+        }
+
+        .nav-link {
+            color: var(--gray);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(10, 10, 30, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-check input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(100, 100, 100, 0.3);
+            color: var(--light);
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(150, 150, 150, 0.5);
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 100, 0, 0.3);
+            border: 1px solid var(--success);
+            color: var(--success);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(100, 0, 0, 0.3);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            display: block;
+        }
+
+        .message.warning {
+            background: rgba(100, 100, 0, 0.3);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .form-col {
+                min-width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">Rust-Cool-Nginx</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="config.html">配置</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="status.html">监控</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="static-file.html">静态文件</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>编辑服务器配置</h1>
+            <p>修改 Rust-Cool-Nginx 服务器配置</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="config-form">
+            <div class="card">
+                <h2 class="card-title">
+                    <span>🖥️</span> 服务器配置
+                </h2>
+                
+                <div class="form-group">
+                    <label for="listen_addr">监听地址:</label>
+                    <input type="text" id="listen_addr" name="listen_addr" class="form-control" placeholder="例如: 127.0.0.1:80">
+                </div>
+                
+                <div class="form-group">
+                    <label for="backend_addr">后端地址:</label>
+                    <input type="text" id="backend_addr" name="backend_addr" class="form-control" placeholder="例如: 127.0.0.1:3000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="static_root">静态文件根目录:</label>
+                    <input type="text" id="static_root" name="static_root" class="form-control" placeholder="例如: ./public">
+                </div>
+                
+                <div class="form-group">
+                    <label for="access_log">访问日志:</label>
+                    <input type="text" id="access_log" name="access_log" class="form-control" placeholder="例如: ./logs/access.log">
+                </div>
+                
+                <div class="form-group">
+                    <label for="error_log">错误日志:</label>
+                    <input type="text" id="error_log" name="error_log" class="form-control" placeholder="例如: ./logs/error.log">
+                </div>
+                
+                <div class="form-group">
+                    <label for="log_level">日志级别:</label>
+                    <select id="log_level" name="log_level" class="form-control">
+                        <option value="debug">Debug</option>
+                        <option value="info">Info</option>
+                        <option value="warn">Warn</option>
+                        <option value="error">Error</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ssl_cert_path">SSL证书路径:</label>
+                    <input type="text" id="ssl_cert_path" name="ssl_cert_path" class="form-control" placeholder="例如: ./certs/server.crt">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ssl_key_path">SSL密钥路径:</label>
+                    <input type="text" id="ssl_key_path" name="ssl_key_path" class="form-control" placeholder="例如: ./certs/server.key">
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" id="ssl_enabled" name="ssl_enabled">
+                    <label for="ssl_enabled">启用SSL</label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">
+                    <span>⚖️</span> 负载均衡配置
+                </h2>
+                
+                <div class="form-group">
+                    <label for="load_balancing_algorithm">负载均衡算法:</label>
+                    <select id="load_balancing_algorithm" name="load_balancing_algorithm" class="form-control">
+                        <option value="round_robin">轮询 (Round Robin)</option>
+                        <option value="least_conn">最少连接 (Least Connections)</option>
+                        <option value="ip_hash">IP哈希 (IP Hash)</option>
+                    </select>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">上游服务器</h3>
+                    
+                    <div id="upstream-servers-container">
+                        <!-- 动态添加的服务器项将在这里显示 -->
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary" id="add-server-btn">添加服务器</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">
+                    <span>⚙️</span> 功能配置
+                </h2>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="section">
+                            <h3 class="section-title">基本功能</h3>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="static_file_serving" name="static_file_serving">
+                                <label for="static_file_serving">静态文件服务</label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="reverse_proxy" name="reverse_proxy">
+                                <label for="reverse_proxy">反向代理</label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="fastcgi_support" name="fastcgi_support">
+                                <label for="fastcgi_support">FastCGI 支持</label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="load_balancing" name="load_balancing">
+                                <label for="load_balancing">负载均衡</label>
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3 class="section-title">安全特性</h3>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="access_control" name="access_control">
+                                <label for="access_control">访问控制</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="allow_ips">允许的IP地址 (每行一个):</label>
+                                <textarea id="allow_ips" name="allow_ips" class="form-control" rows="3" placeholder="例如:&#10;127.0.0.1&#10;192.168.1.0/24"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="deny_ips">拒绝的IP地址 (每行一个):</label>
+                                <textarea id="deny_ips" name="deny_ips" class="form-control" rows="3" placeholder="例如:&#10;192.168.1.100&#10;10.0.0.0/8"></textarea>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="rate_limiting" name="rate_limiting">
+                                <label for="rate_limiting">请求频率限制</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="max_requests_per_minute">每分钟最大请求数:</label>
+                                <input type="number" id="max_requests_per_minute" name="max_requests_per_minute" class="form-control" min="1" placeholder="例如: 1000">
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="ssl_tls" name="ssl_tls">
+                                <label for="ssl_tls">SSL/TLS</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="section">
+                            <h3 class="section-title">性能优化</h3>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="cache_enabled" name="cache_enabled">
+                                <label for="cache_enabled">缓存机制</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cache_path">缓存路径:</label>
+                                <input type="text" id="cache_path" name="cache_path" class="form-control" placeholder="例如: ./cache">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cache_max_size">缓存最大大小:</label>
+                                <input type="text" id="cache_max_size" name="cache_max_size" class="form-control" placeholder="例如: 100M">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cache_inactive">缓存非活动时间:</label>
+                                <input type="text" id="cache_inactive" name="cache_inactive" class="form-control" placeholder="例如: 60m">
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="gzip_compression" name="gzip_compression">
+                                <label for="gzip_compression">Gzip 压缩</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gzip_comp_level">Gzip 压缩级别:</label>
+                                <input type="number" id="gzip_comp_level" name="gzip_comp_level" class="form-control" min="1" max="9" placeholder="1-9">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gzip_min_length">Gzip 最小长度:</label>
+                                <input type="number" id="gzip_min_length" name="gzip_min_length" class="form-control" placeholder="例如: 1024">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gzip_types">Gzip 类型 (每行一个):</label>
+                                <textarea id="gzip_types" name="gzip_types" class="form-control" rows="4" placeholder="例如:&#10;text/plain&#10;text/css&#10;application/json&#10;application/javascript&#10;text/xml&#10;application/xml"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3 class="section-title">其他功能</h3>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="virtual_hosts" name="virtual_hosts">
+                                <label for="virtual_hosts">虚拟主机</label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="websocket_support" name="websocket_support">
+                                <label for="websocket_support">WebSocket 支持</label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" id="monitoring_enabled" name="monitoring_enabled">
+                                <label for="monitoring_enabled">监控启用</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="stats_path">统计路径:</label>
+                                <input type="text" id="stats_path" name="stats_path" class="form-control" placeholder="例如: /nginx_status">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">工作进程配置</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="worker_processes">工作进程数:</label>
+                                <input type="number" id="worker_processes" name="worker_processes" class="form-control" min="1" placeholder="例如: 4">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="worker_connections">工作连接数:</label>
+                                <input type="number" id="worker_connections" name="worker_connections" class="form-control" min="1" placeholder="例如: 1024">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn btn-secondary" id="cancel-btn">取消</button>
+                <button type="submit" class="btn btn-primary" id="save-btn">保存配置</button>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Rust-Cool-Nginx - 高性能 Web 服务器 | 基于 Rust 和 Tokio 构建</p>
+        </div>
+    </footer>
+
+    <script>
+        // 检查是否在 Tauri 环境中运行
+        var isTauri = !!(window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function');
+        
+        // 获取基础URL
+        function getBaseURL() {
+            if (window.location.origin === 'http://tauri.localhost') {
+                return 'http://127.0.0.1';
+            } else {
+                return window.location.origin;
+            }
+        }
+        
+        // 加载配置
+        async function loadConfig() {
+            try {
+                let config;
+                if (isTauri && window.__TAURI__ && window.__TAURI__.core) {
+                    // 在 Tauri 环境中，通过 Tauri 命令获取配置
+                    console.log('在Tauri环境中，尝试调用Tauri命令获取配置');
+                    try {
+                        config = await window.__TAURI__.core.invoke('get_config');
+                        console.log('通过Tauri获取到的配置:', config);
+                    } catch (tauriError) {
+                        console.error('Tauri调用失败:', tauriError);
+                        throw tauriError;
+                    }
+                } else {
+                    // 在 Web 环境中，通过 HTTP API 获取配置
+                    console.log('在Web环境中，通过HTTP API获取配置');
+                    const apiUrl = `${getBaseURL()}/api/config`;
+                    console.log('API URL:', apiUrl);
+                    
+                    const response = await fetch(apiUrl);
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        // 检查响应是否为 JSON 格式
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        config = await response.json();
+                        console.log('通过HTTP API获取到的配置:', config);
+                    } else {
+                        // 如果响应不是 JSON 格式，抛出错误
+                        const text = await response.text();
+                        console.log('HTTP API 响应内容:', text);
+                        console.error('HTTP API 返回非 JSON 响应:', text.substring(0, 100) + '...');
+                        throw new Error('HTTP API 返回非 JSON 响应');
+                    }
+                }
+                
+                // 填充表单
+                populateForm(config);
+                return config;
+            } catch (error) {
+                console.error('获取配置信息失败:', error);
+                showMessage('加载配置信息失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 填充表单
+        function populateForm(config) {
+            console.log('填充表单数据:', config);
+            try {
+                // 服务器配置
+                document.getElementById('listen_addr').value = config.server.listen_addr || '';
+                document.getElementById('backend_addr').value = config.server.backend_addr || '';
+                document.getElementById('static_root').value = config.server.static_root || '';
+                document.getElementById('access_log').value = config.server.access_log || '';
+                document.getElementById('error_log').value = config.server.error_log || '';
+                document.getElementById('log_level').value = config.server.log_level || 'info';
+                document.getElementById('ssl_cert_path').value = config.server.ssl_cert_path || '';
+                document.getElementById('ssl_key_path').value = config.server.ssl_key_path || '';
+                document.getElementById('ssl_enabled').checked = config.server.ssl_enabled || false;
+                
+                // 负载均衡配置
+                document.getElementById('load_balancing_algorithm').value = config.upstream.load_balancing_algorithm || 'round_robin';
+                
+                // 上游服务器
+                const serversContainer = document.getElementById('upstream-servers-container');
+                serversContainer.innerHTML = ''; // 清空现有内容
+                
+                if (config.upstream.servers && config.upstream.servers.length > 0) {
+                    config.upstream.servers.forEach((server, index) => {
+                        addServerField(server, index);
+                    });
+                } else {
+                    // 如果没有服务器，添加一个空的服务器字段
+                    addServerField();
+                }
+                
+                // 功能配置
+                document.getElementById('static_file_serving').checked = config.features.static_file_serving || false;
+                document.getElementById('reverse_proxy').checked = config.features.reverse_proxy || false;
+                document.getElementById('fastcgi_support').checked = config.features.fastcgi_support || false;
+                document.getElementById('load_balancing').checked = config.features.load_balancing || false;
+                document.getElementById('access_control').checked = config.features.access_control || false;
+                document.getElementById('rate_limiting').checked = config.features.rate_limiting || false;
+                document.getElementById('ssl_tls').checked = config.features.ssl_tls || false;
+                document.getElementById('cache_enabled').checked = config.features.cache_enabled || false;
+                document.getElementById('cache_path').value = config.features.cache_path || '';
+                document.getElementById('cache_max_size').value = config.features.cache_max_size || '';
+                document.getElementById('cache_inactive').value = config.features.cache_inactive || '';
+                document.getElementById('gzip_compression').checked = config.features.gzip_compression || false;
+                document.getElementById('gzip_comp_level').value = config.features.gzip_comp_level || '';
+                document.getElementById('gzip_min_length').value = config.features.gzip_min_length || '';
+                
+                // 填充 gzip_types，将数组转换为多行文本
+                if (config.features.gzip_types && Array.isArray(config.features.gzip_types)) {
+                    document.getElementById('gzip_types').value = config.features.gzip_types.join('\n');
+                } else {
+                    document.getElementById('gzip_types').value = '';
+                }
+                
+                // 填充 allow_ips，将数组转换为多行文本
+                if (config.features.allow_ips && Array.isArray(config.features.allow_ips)) {
+                    document.getElementById('allow_ips').value = config.features.allow_ips.join('\n');
+                } else {
+                    document.getElementById('allow_ips').value = '';
+                }
+                
+                // 填充 deny_ips，将数组转换为多行文本
+                if (config.features.deny_ips && Array.isArray(config.features.deny_ips)) {
+                    document.getElementById('deny_ips').value = config.features.deny_ips.join('\n');
+                } else {
+                    document.getElementById('deny_ips').value = '';
+                }
+                
+                document.getElementById('max_requests_per_minute').value = config.features.max_requests_per_minute || 1000;
+                document.getElementById('virtual_hosts').checked = config.features.virtual_hosts || false;
+                document.getElementById('websocket_support').checked = config.features.websocket_support || false;
+                document.getElementById('monitoring_enabled').checked = config.features.monitoring_enabled || false;
+                document.getElementById('stats_path').value = config.features.stats_path || '';
+                document.getElementById('worker_processes').value = config.features.worker_processes || '';
+                document.getElementById('worker_connections').value = config.features.worker_connections || '';
+            } catch (e) {
+                console.error('填充表单时出错:', e);
+                showMessage('填充表单时出错: ' + e.message, 'error');
+            }
+        }
+        
+        // 添加服务器字段
+        function addServerField(server = {}, index = null) {
+            const serversContainer = document.getElementById('upstream-servers-container');
+            const serverCount = serversContainer.children.length;
+            const serverIndex = index !== null ? index : serverCount;
+            
+            const serverDiv = document.createElement('div');
+            serverDiv.className = 'server-item card';
+            serverDiv.innerHTML = `
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="server_address_${serverIndex}">服务器地址:</label>
+                            <input type="text" id="server_address_${serverIndex}" name="server_address_${serverIndex}" class="form-control" 
+                                   value="${server.address || ''}" placeholder="例如: 127.0.0.1:8080">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="server_weight_${serverIndex}">权重:</label>
+                            <input type="number" id="server_weight_${serverIndex}" name="server_weight_${serverIndex}" class="form-control" 
+                                   value="${server.weight || 1}" min="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="server_max_fails_${serverIndex}">最大失败次数:</label>
+                            <input type="number" id="server_max_fails_${serverIndex}" name="server_max_fails_${serverIndex}" class="form-control" 
+                                   value="${server.max_fails || 3}" min="1">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="server_fail_timeout_${serverIndex}">失败超时:</label>
+                            <input type="text" id="server_fail_timeout_${serverIndex}" name="server_fail_timeout_${serverIndex}" class="form-control" 
+                                   value="${server.fail_timeout || '10s'}" placeholder="例如: 10s">
+                        </div>
+                    </div>
+                </div>
+                <div class="actions" style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <button type="button" class="btn btn-secondary remove-server-btn">删除服务器</button>
+                </div>
+            `;
+            
+            serversContainer.appendChild(serverDiv);
+            
+            // 绑定删除按钮事件
+            const removeBtn = serverDiv.querySelector('.remove-server-btn');
+            removeBtn.addEventListener('click', function() {
+                serversContainer.removeChild(serverDiv);
+            });
+        }
+        
+        // 获取表单数据
+        function getFormData() {
+            const serversContainer = document.getElementById('upstream-servers-container');
+            const serverElements = serversContainer.querySelectorAll('.server-item');
+            const servers = [];
+            
+            serverElements.forEach((serverElement, index) => {
+                const address = document.getElementById(`server_address_${index}`).value;
+                const weight = parseInt(document.getElementById(`server_weight_${index}`).value) || 1;
+                const max_fails = parseInt(document.getElementById(`server_max_fails_${index}`).value) || 3;
+                const fail_timeout = document.getElementById(`server_fail_timeout_${index}`).value || '10s';
+                
+                // 只有当地址不为空时才添加服务器
+                if (address) {
+                    servers.push({
+                        address: address,
+                        weight: weight,
+                        max_fails: max_fails,
+                        fail_timeout: fail_timeout
+                    });
+                }
+            });
+            
+            const formData = {
+                server: {
+                    listen_addr: document.getElementById('listen_addr').value,
+                    backend_addr: document.getElementById('backend_addr').value,
+                    static_root: document.getElementById('static_root').value,
+                    access_log: document.getElementById('access_log').value,
+                    error_log: document.getElementById('error_log').value,
+                    log_level: document.getElementById('log_level').value,
+                    ssl_cert_path: document.getElementById('ssl_cert_path').value,
+                    ssl_key_path: document.getElementById('ssl_key_path').value,
+                    ssl_enabled: document.getElementById('ssl_enabled').checked
+                },
+                upstream: {
+                    load_balancing_algorithm: document.getElementById('load_balancing_algorithm').value,
+                    servers: servers
+                },
+                features: {
+                    static_file_serving: document.getElementById('static_file_serving').checked,
+                    reverse_proxy: document.getElementById('reverse_proxy').checked,
+                    fastcgi_support: document.getElementById('fastcgi_support').checked,
+                    load_balancing: document.getElementById('load_balancing').checked,
+                    cache_enabled: document.getElementById('cache_enabled').checked,
+                    cache_path: document.getElementById('cache_path').value,
+                    cache_max_size: document.getElementById('cache_max_size').value,
+                    cache_inactive: document.getElementById('cache_inactive').value,
+                    gzip_compression: document.getElementById('gzip_compression').checked,
+                    gzip_comp_level: parseInt(document.getElementById('gzip_comp_level').value) || 0,
+                    gzip_min_length: parseInt(document.getElementById('gzip_min_length').value) || 0,
+                    gzip_types: document.getElementById('gzip_types').value.split('\n').filter(type => type.trim() !== ''),
+                    virtual_hosts: document.getElementById('virtual_hosts').checked,
+                    access_control: document.getElementById('access_control').checked,
+                    allow_ips: document.getElementById('allow_ips').value.split('\n').filter(ip => ip.trim() !== ''),
+                    deny_ips: document.getElementById('deny_ips').value.split('\n').filter(ip => ip.trim() !== ''),
+                    rate_limiting: document.getElementById('rate_limiting').checked,
+                    max_requests_per_minute: parseInt(document.getElementById('max_requests_per_minute').value) || 1000,
+                    ssl_tls: document.getElementById('ssl_tls').checked,
+                    websocket_support: document.getElementById('websocket_support').checked,
+                    worker_processes: parseInt(document.getElementById('worker_processes').value) || 0,
+                    worker_connections: parseInt(document.getElementById('worker_connections').value) || 0,
+                    monitoring_enabled: document.getElementById('monitoring_enabled').checked,
+                    stats_path: document.getElementById('stats_path').value
+                }
+            };
+            
+            return formData;
+        }
+        
+        // 保存配置
+        async function saveConfig() {
+            try {
+                const config = getFormData();
+                console.log('准备保存的配置:', config);
+                
+                if (isTauri && window.__TAURI__ && window.__TAURI__.core) {
+                    // 在 Tauri 环境中，通过 Tauri 命令更新配置
+                    console.log('在Tauri环境中，尝试调用Tauri命令更新配置');
+                    try {
+                        await window.__TAURI__.core.invoke('update_config', config);
+                        showMessage('配置保存成功！', 'success');
+                        
+                        // 3秒后跳转到配置查看页面
+                        setTimeout(() => {
+                            window.location.href = 'config.html';
+                        }, 3000);
+                    } catch (tauriError) {
+                        console.error('Tauri调用失败:', tauriError);
+                        showMessage('Tauri调用失败: ' + tauriError.message, 'error');
+                        throw tauriError;
+                    }
+                } else {
+                    // 在 Web 环境中，通过 HTTP API 更新配置
+                    console.log('在Web环境中，通过HTTP API更新配置');
+                    const apiUrl = `${getBaseURL()}/api/config`;
+                    console.log('API URL:', apiUrl);
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(config)
+                    });
+                    
+                    console.log('HTTP响应状态:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('HTTP错误响应内容:', errorText);
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('通过HTTP API更新配置成功:', result);
+                    showMessage('配置保存成功！', 'success');
+                    
+                    // 3秒后跳转到配置查看页面
+                    setTimeout(() => {
+                        window.location.href = 'config.html';
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                showMessage('保存配置失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 5000);
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 增加延迟确保 Tauri 完全初始化
+            setTimeout(function() {
+                // 检查是否在 Tauri 环境中运行
+                isTauri = !!(window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function');
+                console.log('Tauri environment check result:', isTauri);
+                
+                // 加载配置
+                loadConfig();
+            }, 500); // 延迟 500ms 确保 Tauri 完全初始化
+            
+            // 绑定事件
+            document.getElementById('config-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveConfig();
+            });
+            
+            document.getElementById('cancel-btn').addEventListener('click', function() {
+                window.location.href = 'config.html';
+            });
+            
+            document.getElementById('add-server-btn').addEventListener('click', function() {
+                addServerField();
+            });
+        });
+    </script>
+</body>
+</html>
