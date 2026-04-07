@@ -6737,7 +6737,6 @@ version = "0.1.0"
 dependencies = [
  "hyper 0.14.32",
  "hyper-staticfile",
- "lazy_static",
  "log",
  "serde",
  "serde_json",
